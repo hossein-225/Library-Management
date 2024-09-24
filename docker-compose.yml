@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - book-service
+      - user-service
+      - borrow-service
+      - auth-service
+
+  book-service:
+    build: ./book-service
+    ports:
+      - "50051:50051"
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "50052:50052"
+
+  borrow-service:
+    build: ./borrow-service
+    ports:
+      - "50053:50053"
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "50054:50054"

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package borrow;
+
+option go_package = "./borrow-service/proto";
+
+service BorrowService {
+  rpc BorrowBook (BorrowBookRequest) returns (BorrowBookResponse);
+  rpc ReturnBook (ReturnBookRequest) returns (ReturnBookResponse);
+}
+
+message BorrowBookRequest {
+  string user_id = 1;
+  string book_id = 2;
+}
+
+message BorrowBookResponse {
+  string message = 1;
+}
+
+message ReturnBookRequest {
+  string user_id = 1;
+  string book_id = 2;
+}
+
+message ReturnBookResponse {
+  string message = 1;
+}
