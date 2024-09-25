@@ -23,4 +23,4 @@ COPY --from=builder /book-service .
 
 EXPOSE 50051
 
-ENTRYPOINT ["./entrypoint"]
+ENTRYPOINT ["./book-service"]
