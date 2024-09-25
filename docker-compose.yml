@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   api-gateway:
     build: ./api-gateway
@@ -10,23 +8,89 @@ services:
       - user-service
       - borrow-service
       - auth-service
+    networks:
+      - library-network
 
   book-service:
     build: ./book-service
     ports:
       - "50051:50051"
+    networks:
+      - library-network
+    depends_on:
+      - book-db
 
   user-service:
     build: ./user-service
     ports:
       - "50052:50052"
+    networks:
+      - library-network
+    depends_on:
+      - user-db
 
   borrow-service:
     build: ./borrow-service
     ports:
       - "50053:50053"
+    networks:
+      - library-network
+    depends_on:
+      - borrow-db
 
   auth-service:
     build: ./auth-service
     ports:
       - "50054:50054"
+    networks:
+      - library-network
+    depends_on:
+      - auth-db
+
+  book-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: book_db
+    ports:
+      - "5432:5432"
+    networks:
+      - library-network
+
+  user-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user_db
+    ports:
+      - "5433:5432"
+    networks:
+      - library-network
+
+  borrow-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: borrow_db
+    ports:
+      - "5434:5432"
+    networks:
+      - library-network
+
+  auth-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auth_db
+    ports:
+      - "5435:5432"
+    networks:
+      - library-network
+
+networks:
+  library-network:
+    driver: bridge
