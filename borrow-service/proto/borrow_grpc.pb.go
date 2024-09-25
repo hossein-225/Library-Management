@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BorrowService_BorrowBook_FullMethodName = "/borrow.BorrowService/BorrowBook"
-	BorrowService_ReturnBook_FullMethodName = "/borrow.BorrowService/ReturnBook"
+	BorrowService_BorrowBook_FullMethodName     = "/borrow.BorrowService/BorrowBook"
+	BorrowService_ReturnBook_FullMethodName     = "/borrow.BorrowService/ReturnBook"
+	BorrowService_GetUserBorrows_FullMethodName = "/borrow.BorrowService/GetUserBorrows"
 )
 
 // BorrowServiceClient is the client API for BorrowService service.
@@ -29,6 +30,7 @@ const (
 type BorrowServiceClient interface {
 	BorrowBook(ctx context.Context, in *BorrowBookRequest, opts ...grpc.CallOption) (*BorrowBookResponse, error)
 	ReturnBook(ctx context.Context, in *ReturnBookRequest, opts ...grpc.CallOption) (*ReturnBookResponse, error)
+	GetUserBorrows(ctx context.Context, in *GetUserBorrowsRequest, opts ...grpc.CallOption) (*GetUserBorrowsResponse, error)
 }
 
 type borrowServiceClient struct {
@@ -59,12 +61,23 @@ func (c *borrowServiceClient) ReturnBook(ctx context.Context, in *ReturnBookRequ
 	return out, nil
 }
 
+func (c *borrowServiceClient) GetUserBorrows(ctx context.Context, in *GetUserBorrowsRequest, opts ...grpc.CallOption) (*GetUserBorrowsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserBorrowsResponse)
+	err := c.cc.Invoke(ctx, BorrowService_GetUserBorrows_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BorrowServiceServer is the server API for BorrowService service.
 // All implementations must embed UnimplementedBorrowServiceServer
 // for forward compatibility.
 type BorrowServiceServer interface {
 	BorrowBook(context.Context, *BorrowBookRequest) (*BorrowBookResponse, error)
 	ReturnBook(context.Context, *ReturnBookRequest) (*ReturnBookResponse, error)
+	GetUserBorrows(context.Context, *GetUserBorrowsRequest) (*GetUserBorrowsResponse, error)
 	mustEmbedUnimplementedBorrowServiceServer()
 }
 
@@ -80,6 +93,9 @@ func (UnimplementedBorrowServiceServer) BorrowBook(context.Context, *BorrowBookR
 }
 func (UnimplementedBorrowServiceServer) ReturnBook(context.Context, *ReturnBookRequest) (*ReturnBookResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReturnBook not implemented")
+}
+func (UnimplementedBorrowServiceServer) GetUserBorrows(context.Context, *GetUserBorrowsRequest) (*GetUserBorrowsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserBorrows not implemented")
 }
 func (UnimplementedBorrowServiceServer) mustEmbedUnimplementedBorrowServiceServer() {}
 func (UnimplementedBorrowServiceServer) testEmbeddedByValue()                       {}
@@ -138,6 +154,24 @@ func _BorrowService_ReturnBook_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BorrowService_GetUserBorrows_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserBorrowsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BorrowServiceServer).GetUserBorrows(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BorrowService_GetUserBorrows_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BorrowServiceServer).GetUserBorrows(ctx, req.(*GetUserBorrowsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BorrowService_ServiceDesc is the grpc.ServiceDesc for BorrowService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +186,10 @@ var BorrowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReturnBook",
 			Handler:    _BorrowService_ReturnBook_Handler,
+		},
+		{
+			MethodName: "GetUserBorrows",
+			Handler:    _BorrowService_GetUserBorrows_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

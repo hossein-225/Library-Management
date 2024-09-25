@@ -7,6 +7,14 @@ option go_package = "./borrow-service/proto";
 service BorrowService {
   rpc BorrowBook (BorrowBookRequest) returns (BorrowBookResponse);
   rpc ReturnBook (ReturnBookRequest) returns (ReturnBookResponse);
+  rpc GetUserBorrows (GetUserBorrowsRequest) returns (GetUserBorrowsResponse);
+}
+
+message Borrow {
+  string id = 1;
+  string user_id = 2;
+  string book_id = 3;
+  bool borrowed = 4;
 }
 
 message BorrowBookRequest {
@@ -25,4 +33,12 @@ message ReturnBookRequest {
 
 message ReturnBookResponse {
   string message = 1;
+}
+
+message GetUserBorrowsRequest {
+  string user_id = 1;
+}
+
+message GetUserBorrowsResponse {
+  repeated Borrow borrows = 1;
 }
