@@ -1,0 +1,192 @@
+definitions:
+  proto.AuthenticateUserResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  proto.GetUserProfileResponse:
+    properties:
+      user:
+        $ref: '#/definitions/proto.User'
+    type: object
+  proto.RegisterUserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/proto.User'
+    type: object
+  proto.UpdateUserProfileResponse:
+    properties:
+      user:
+        $ref: '#/definitions/proto.User'
+    type: object
+  proto.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+info:
+  title: "user-service"
+  version: "0.4.0"
+  contact: {}
+paths:
+  /users/authenticate:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: Email of the user
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Password of the user
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User authenticated successfully
+          schema:
+            $ref: '#/definitions/proto.AuthenticateUserResponse'
+        "400":
+          description: Invalid email or password
+          schema:
+            type: string
+        "500":
+          description: Failed to generate token
+          schema:
+            type: string
+      summary: Authenticate a user
+      tags:
+      - users
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the profile information for the authenticated user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile retrieved successfully
+          schema:
+            $ref: '#/definitions/proto.GetUserProfileResponse'
+        "400":
+          description: User ID cannot be empty
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get a user's profile
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update profile information for the authenticated user
+      parameters:
+      - description: User ID
+        in: body
+        name: user_id
+        required: true
+        schema:
+          type: string
+      - description: New name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: New email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile updated successfully
+          schema:
+            $ref: '#/definitions/proto.UpdateUserProfileResponse'
+        "400":
+          description: User ID, name, or email cannot be empty
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update a user's profile
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with the provided information
+      parameters:
+      - description: Name of the user
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Email of the user
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Password of the user
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/proto.RegisterUserResponse'
+        "400":
+          description: Name or email cannot be empty
+          schema:
+            type: string
+        "500":
+          description: Failed to register user
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - users
+swagger: "2.0"

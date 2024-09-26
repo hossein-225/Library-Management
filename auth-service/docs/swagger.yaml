@@ -1,0 +1,78 @@
+definitions:
+  proto.GenerateTokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  proto.ValidateTokenResponse:
+    properties:
+      user_id:
+        type: string
+    type: object
+info:
+  title: "auth-service"
+  version: "0.4.0"
+  contact: {}
+paths:
+  /auth/token:
+    post:
+      consumes:
+      - application/json
+      description: Generates a JWT token for the user with the provided user ID
+      parameters:
+      - description: User ID
+        in: body
+        name: user_id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token generated successfully
+          schema:
+            $ref: '#/definitions/proto.GenerateTokenResponse'
+        "400":
+          description: User ID cannot be empty
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Generate a JWT token for a user
+      tags:
+      - auth
+  /auth/validate:
+    post:
+      consumes:
+      - application/json
+      description: Validates the provided JWT token and returns the associated user
+        ID
+      parameters:
+      - description: JWT token
+        in: body
+        name: token
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token validated successfully
+          schema:
+            $ref: '#/definitions/proto.ValidateTokenResponse'
+        "400":
+          description: Token cannot be empty or is invalid
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Validate a JWT token
+      tags:
+      - auth
+swagger: "2.0"

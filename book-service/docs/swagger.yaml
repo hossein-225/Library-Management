@@ -1,0 +1,192 @@
+definitions:
+  proto.AddBookResponse:
+    properties:
+      book:
+        $ref: '#/definitions/proto.Book'
+    type: object
+  proto.Book:
+    properties:
+      author:
+        type: string
+      available:
+        type: boolean
+      category:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  proto.DeleteBookResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  proto.ListBooksResponse:
+    properties:
+      books:
+        items:
+          $ref: '#/definitions/proto.Book'
+        type: array
+    type: object
+  proto.UpdateBookResponse:
+    properties:
+      book:
+        $ref: '#/definitions/proto.Book'
+    type: object
+info:
+  title: "book-service"
+  version: "0.4.0"
+  contact: {}
+paths:
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of available books in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of books retrieved successfully
+          schema:
+            $ref: '#/definitions/proto.ListBooksResponse'
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Retrieve a list of books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Adds a new book to the library
+      parameters:
+      - description: Title of the book
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Author of the book
+        in: body
+        name: author
+        required: true
+        schema:
+          type: string
+      - description: Category of the book
+        in: body
+        name: category
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book added successfully
+          schema:
+            $ref: '#/definitions/proto.AddBookResponse'
+        "400":
+          description: Title, author, or category cannot be empty
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Add a new book
+      tags:
+      - books
+  /books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a book from the library by its ID
+      parameters:
+      - description: ID of the book to delete
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book deleted successfully
+          schema:
+            $ref: '#/definitions/proto.DeleteBookResponse'
+        "400":
+          description: Book ID cannot be empty
+          schema:
+            type: string
+        "404":
+          description: Book not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete a book
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      description: Updates the information of an existing book in the library
+      parameters:
+      - description: ID of the book
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Title of the book
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Author of the book
+        in: body
+        name: author
+        required: true
+        schema:
+          type: string
+      - description: Category of the book
+        in: body
+        name: category
+        required: true
+        schema:
+          type: string
+      - description: Availability status of the book
+        in: body
+        name: available
+        required: true
+        schema:
+          type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book updated successfully
+          schema:
+            $ref: '#/definitions/proto.UpdateBookResponse'
+        "400":
+          description: ID, title, author, or category cannot be empty
+          schema:
+            type: string
+        "404":
+          description: Book not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update a book's information
+      tags:
+      - books
+swagger: "2.0"

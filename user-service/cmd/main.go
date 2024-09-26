@@ -3,15 +3,21 @@ package main
 import (
 	"database/sql"
 	"log"
-	"net"
 
+	"github.com/gin-gonic/gin"
 	"github.com/hossein-225/Library-Management/user-service/internal/application"
 	user_grpc "github.com/hossein-225/Library-Management/user-service/internal/infrastructure/grpc"
 	"github.com/hossein-225/Library-Management/user-service/internal/infrastructure/repository"
 	pb "github.com/hossein-225/Library-Management/user-service/proto"
-	"google.golang.org/grpc"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"net"
+
+	_ "github.com/hossein-225/Library-Management/user-service/docs"
 
 	_ "github.com/lib/pq"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -33,8 +39,17 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterUserServiceServer(s, grpcServer)
 
-	log.Println("User Service is running on port 50052...")
-	if err := s.Serve(listener); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	go func() {
+		log.Println("User Service is running on port 50052...")
+		if err := s.Serve(listener); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+	router := gin.Default()
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	log.Println("Swagger is available at http://localhost:8080/swagger/index.html")
+	router.Run(":8080")
 }
