@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenerateJWT(t *testing.T) {
-	token, err := utils.GenerateJWT("user123")
+	token, err := utils.GenerateJWT("user123", "admin")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, token)
 

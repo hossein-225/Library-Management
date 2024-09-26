@@ -11,6 +11,7 @@ service AuthService {
 
 message GenerateTokenRequest {
   string user_id = 1;
+  Role role = 2;
 }
 
 message GenerateTokenResponse {
@@ -23,4 +24,11 @@ message ValidateTokenRequest {
 
 message ValidateTokenResponse {
   string user_id = 1;
+  Role role = 2;
+}
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ADMIN = 1;
+  USER = 2;
 }

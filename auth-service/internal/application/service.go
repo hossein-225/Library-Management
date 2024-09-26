@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/hossein-225/Library-Management/auth-service/internal/domain"
-	"github.com/hossein-225/Library-Management/auth-service/pkg/utils"
+	pb "github.com/hossein-225/Library-Management/auth-service/proto"
 )
 
 type AuthService struct {
@@ -15,8 +15,8 @@ func NewAuthService(repo domain.AuthRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) GenerateToken(ctx context.Context, userID string) (string, error) {
-	return utils.GenerateJWT(userID)
+func (s *AuthService) GenerateToken(ctx context.Context, userID string, role pb.Role) (string, error) {
+	return s.repo.GenerateToken(userID, role)
 }
 
 func (s *AuthService) ValidateToken(ctx context.Context, token string) (string, error) {

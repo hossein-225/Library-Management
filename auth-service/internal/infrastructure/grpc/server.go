@@ -20,14 +20,15 @@ func NewAuthGRPCServer(service *application.AuthService) *AuthGRPCServer {
 }
 
 // GenerateToken
-// @Summary Generate a JWT token for a user
-// @Description Generates a JWT token for the user with the provided user ID
+// @Summary Generate a JWT token for a user with a role
+// @Description Generates a JWT token for the user with the provided user ID and role
 // @Tags auth
 // @Accept  json
 // @Produce  json
 // @Param   user_id  body   string   true  "User ID"
+// @Param   role     body   string   true  "User role"
 // @Success 200 {object} pb.GenerateTokenResponse "Token generated successfully"
-// @Failure 400 {string} string "User ID cannot be empty"
+// @Failure 400 {string} string "User ID or Role cannot be empty"
 // @Failure 500 {string} string "Internal server error"
 // @Router /auth/token [post]
 func (s *AuthGRPCServer) GenerateToken(ctx context.Context, req *pb.GenerateTokenRequest) (*pb.GenerateTokenResponse, error) {
@@ -35,7 +36,7 @@ func (s *AuthGRPCServer) GenerateToken(ctx context.Context, req *pb.GenerateToke
 		return nil, status.Errorf(codes.InvalidArgument, "User ID cannot be empty")
 	}
 
-	token, err := s.service.GenerateToken(ctx, req.UserId)
+	token, err := s.service.GenerateToken(ctx, req.UserId, req.Role)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to generate token: %v", err)
 	}
