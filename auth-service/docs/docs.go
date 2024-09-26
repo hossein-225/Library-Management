@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/auth/token": {
             "post": {
-                "description": "Generates a JWT token for the user with the provided user ID",
+                "description": "Generates a JWT token for the user with the provided user ID and role",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,11 +27,20 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "Generate a JWT token for a user",
+                "summary": "Generate a JWT token for a user with a role",
                 "parameters": [
                     {
                         "description": "User ID",
                         "name": "user_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "User role",
+                        "name": "role",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -43,11 +52,12 @@ const docTemplate = `{
                     "200": {
                         "description": "Token generated successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.GenerateTokenResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "User ID cannot be empty",
+                        "description": "User ID or Role cannot be empty",
                         "schema": {
                             "type": "string"
                         }
@@ -63,7 +73,7 @@ const docTemplate = `{
         },
         "/auth/validate": {
             "post": {
-                "description": "Validates the provided JWT token and returns the associated user ID",
+                "description": "Validates the provided JWT token and returns the associated user ID and role",
                 "consumes": [
                     "application/json"
                 ],
@@ -89,11 +99,18 @@ const docTemplate = `{
                     "200": {
                         "description": "Token validated successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.ValidateTokenResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
                         "description": "Token cannot be empty or is invalid",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid token: missing userID or role",
                         "schema": {
                             "type": "string"
                         }
@@ -107,35 +124,17 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "definitions": {
-        "proto.GenerateTokenResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.ValidateTokenResponse": {
-            "type": "object",
-            "properties": {
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "0.0.6",
+	Host:             "auth-service:50054",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Library Management API - auth-service",
+	Description:      "API documentation for the Library Management system - auth-service",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

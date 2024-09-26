@@ -1,36 +1,10 @@
-definitions:
-  proto.Borrow:
-    properties:
-      book_id:
-        type: string
-      borrowed:
-        type: boolean
-      id:
-        type: string
-      user_id:
-        type: string
-    type: object
-  proto.BorrowBookResponse:
-    properties:
-      message:
-        type: string
-    type: object
-  proto.GetUserBorrowsResponse:
-    properties:
-      borrows:
-        items:
-          $ref: '#/definitions/proto.Borrow'
-        type: array
-    type: object
-  proto.ReturnBookResponse:
-    properties:
-      message:
-        type: string
-    type: object
+basePath: /
+host: borrow-service:50053
 info:
-  title: "borrow-service"
-  version: "0.4.0"
   contact: {}
+  description: API documentation for the Library Management system - borrow-service
+  title: Library Management API - borrow-service
+  version: 0.0.6
 paths:
   /borrow:
     post:
@@ -56,7 +30,8 @@ paths:
         "200":
           description: Book borrowed successfully
           schema:
-            $ref: '#/definitions/proto.BorrowBookResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: User ID or Book ID cannot be empty
           schema:
@@ -90,7 +65,8 @@ paths:
         "200":
           description: List of borrowed books retrieved successfully
           schema:
-            $ref: '#/definitions/proto.GetUserBorrowsResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: User ID cannot be empty
           schema:
@@ -130,7 +106,8 @@ paths:
         "200":
           description: Book returned successfully
           schema:
-            $ref: '#/definitions/proto.ReturnBookResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: User ID or Book ID cannot be empty
           schema:

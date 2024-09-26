@@ -1,37 +1,10 @@
-definitions:
-  proto.AuthenticateUserResponse:
-    properties:
-      token:
-        type: string
-    type: object
-  proto.GetUserProfileResponse:
-    properties:
-      user:
-        $ref: '#/definitions/proto.User'
-    type: object
-  proto.RegisterUserResponse:
-    properties:
-      user:
-        $ref: '#/definitions/proto.User'
-    type: object
-  proto.UpdateUserProfileResponse:
-    properties:
-      user:
-        $ref: '#/definitions/proto.User'
-    type: object
-  proto.User:
-    properties:
-      email:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-    type: object
+basePath: /
+host: user-service:50052
 info:
-  title: "user-service"
-  version: "0.4.0"
   contact: {}
+  description: API documentation for the Library Management system - user-service
+  title: Library Management API - user-service
+  version: 0.0.6
 paths:
   /users/authenticate:
     post:
@@ -57,7 +30,8 @@ paths:
         "200":
           description: User authenticated successfully
           schema:
-            $ref: '#/definitions/proto.AuthenticateUserResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: Invalid email or password
           schema:
@@ -86,7 +60,8 @@ paths:
         "200":
           description: Profile retrieved successfully
           schema:
-            $ref: '#/definitions/proto.GetUserProfileResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: User ID cannot be empty
           schema:
@@ -131,7 +106,8 @@ paths:
         "200":
           description: Profile updated successfully
           schema:
-            $ref: '#/definitions/proto.UpdateUserProfileResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: User ID, name, or email cannot be empty
           schema:
@@ -177,7 +153,8 @@ paths:
         "200":
           description: User registered successfully
           schema:
-            $ref: '#/definitions/proto.RegisterUserResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: Name or email cannot be empty
           schema:

@@ -17,6 +17,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// @title Library Management API - borrow-service
+// @version 0.0.6
+// @description API documentation for the Library Management system - borrow-service
+
+// @host borrow-service:50053
+// @BasePath /
 func main() {
 	db, err := sql.Open("postgres", "user=postgres password=password dbname=borrow_db sslmode=disable")
 	if err != nil {

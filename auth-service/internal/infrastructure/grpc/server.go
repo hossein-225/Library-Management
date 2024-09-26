@@ -27,7 +27,7 @@ func NewAuthGRPCServer(service *application.AuthService) *AuthGRPCServer {
 // @Produce  json
 // @Param   user_id  body   string   true  "User ID"
 // @Param   role     body   string   true  "User role"
-// @Success 200 {object} pb.GenerateTokenResponse "Token generated successfully"
+// @Success 200 {object} map[string]interface{} "Token generated successfully"
 // @Failure 400 {string} string "User ID or Role cannot be empty"
 // @Failure 500 {string} string "Internal server error"
 // @Router /auth/token [post]
@@ -51,7 +51,7 @@ func (s *AuthGRPCServer) GenerateToken(ctx context.Context, req *pb.GenerateToke
 // @Accept  json
 // @Produce  json
 // @Param   token  body   string   true  "JWT token"
-// @Success 200 {object} pb.ValidateTokenResponse "Token validated successfully"
+// @Success 200 {object} map[string]interface{} "Token validated successfully"
 // @Failure 400 {string} string "Token cannot be empty or is invalid"
 // @Failure 401 {string} string "Invalid token: missing userID or role"
 // @Failure 500 {string} string "Internal server error"

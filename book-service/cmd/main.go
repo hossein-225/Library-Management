@@ -18,6 +18,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// @title Library Management API - book-service
+// @version 0.0.6
+// @description API documentation for the Library Management system - book-service
+
+// @host book-service:50051
+// @BasePath /
 func main() {
 	db, err := sql.Open("postgres", "user=postgres password=password dbname=book_db sslmode=disable")
 	if err != nil {

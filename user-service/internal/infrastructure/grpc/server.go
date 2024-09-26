@@ -29,7 +29,7 @@ func NewUserGRPCServer(service *application.UserService) *UserGRPCServer {
 // @Param   name     body   string   true  "Name of the user"
 // @Param   email    body   string   true  "Email of the user"
 // @Param   password body   string   true  "Password of the user"
-// @Success 200 {object} pb.RegisterUserResponse "User registered successfully"
+// @Success 200 {object} map[string]interface{} "User registered successfully"
 // @Failure 400 {string} string "Name or email cannot be empty"
 // @Failure 500 {string} string "Failed to register user"
 // @Router /users/register [post]
@@ -66,7 +66,7 @@ func (s *UserGRPCServer) RegisterUser(ctx context.Context, req *pb.RegisterUserR
 // @Produce  json
 // @Param   email    body   string   true  "Email of the user"
 // @Param   password body   string   true  "Password of the user"
-// @Success 200 {object} pb.AuthenticateUserResponse "User authenticated successfully"
+// @Success 200 {object} map[string]interface{} "User authenticated successfully"
 // @Failure 400 {string} string "Invalid email or password"
 // @Failure 500 {string} string "Failed to generate token"
 // @Router /users/authenticate [post]
@@ -97,7 +97,7 @@ func (s *UserGRPCServer) AuthenticateUser(ctx context.Context, req *pb.Authentic
 // @Accept  json
 // @Produce  json
 // @Param   user_id  query  string   true  "User ID"
-// @Success 200 {object} pb.GetUserProfileResponse "Profile retrieved successfully"
+// @Success 200 {object} map[string]interface{} "Profile retrieved successfully"
 // @Failure 400 {string} string "User ID cannot be empty"
 // @Failure 404 {string} string "User not found"
 // @Failure 500 {string} string "Internal server error"
@@ -130,7 +130,7 @@ func (s *UserGRPCServer) GetUserProfile(ctx context.Context, req *pb.GetUserProf
 // @Param   user_id  body   string   true  "User ID"
 // @Param   name     body   string   true  "New name"
 // @Param   email    body   string   true  "New email"
-// @Success 200 {object} pb.UpdateUserProfileResponse "Profile updated successfully"
+// @Success 200 {object} map[string]interface{} "Profile updated successfully"
 // @Failure 400 {string} string "User ID, name, or email cannot be empty"
 // @Failure 404 {string} string "User not found"
 // @Failure 500 {string} string "Internal server error"

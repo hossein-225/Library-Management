@@ -1,4 +1,4 @@
-module github.com/hossein-225/Library-Management/api-gateway-service
+module github.com/hossein-225/Library-Management/api-gateway
 
 go 1.23.0
 

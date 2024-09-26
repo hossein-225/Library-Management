@@ -1,14 +1,17 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "auth-service",
-        "version": "0.4.0",
-        "contact": {}
+        "description": "API documentation for the Library Management system - auth-service",
+        "title": "Library Management API - auth-service",
+        "contact": {},
+        "version": "0.0.6"
     },
+    "host": "auth-service:50054",
+    "basePath": "/",
     "paths": {
         "/auth/token": {
             "post": {
-                "description": "Generates a JWT token for the user with the provided user ID",
+                "description": "Generates a JWT token for the user with the provided user ID and role",
                 "consumes": [
                     "application/json"
                 ],
@@ -18,11 +21,20 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "Generate a JWT token for a user",
+                "summary": "Generate a JWT token for a user with a role",
                 "parameters": [
                     {
                         "description": "User ID",
                         "name": "user_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "User role",
+                        "name": "role",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -34,11 +46,12 @@
                     "200": {
                         "description": "Token generated successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.GenerateTokenResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "User ID cannot be empty",
+                        "description": "User ID or Role cannot be empty",
                         "schema": {
                             "type": "string"
                         }
@@ -54,7 +67,7 @@
         },
         "/auth/validate": {
             "post": {
-                "description": "Validates the provided JWT token and returns the associated user ID",
+                "description": "Validates the provided JWT token and returns the associated user ID and role",
                 "consumes": [
                     "application/json"
                 ],
@@ -80,11 +93,18 @@
                     "200": {
                         "description": "Token validated successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.ValidateTokenResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
                         "description": "Token cannot be empty or is invalid",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid token: missing userID or role",
                         "schema": {
                             "type": "string"
                         }
@@ -95,24 +115,6 @@
                             "type": "string"
                         }
                     }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "proto.GenerateTokenResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.ValidateTokenResponse": {
-            "type": "object",
-            "properties": {
-                "user_id": {
-                    "type": "string"
                 }
             }
         }

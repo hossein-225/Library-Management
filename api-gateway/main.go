@@ -4,13 +4,13 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/hossein-225/Library-Management/api-gateway/docs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	// _ "path/to/your/project/docs"
 )
 
 // @title Library Management API
-// @version 1.0
+// @version 0.0.6
 // @description API documentation for the Library Management system
 
 // @host localhost:8080

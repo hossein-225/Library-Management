@@ -26,7 +26,7 @@ func NewBorrowGRPCServer(service *application.BorrowService) *BorrowGRPCServer {
 // @Produce  json
 // @Param   user_id  body   string   true  "User ID"
 // @Param   book_id  body   string   true  "Book ID"
-// @Success 200 {object} pb.BorrowBookResponse "Book borrowed successfully"
+// @Success 200 {object} map[string]interface{} "Book borrowed successfully"
 // @Failure 400 {string} string "User ID or Book ID cannot be empty"
 // @Failure 404 {string} string "Book or User not found"
 // @Failure 500 {string} string "Internal server error"
@@ -54,7 +54,7 @@ func (s *BorrowGRPCServer) BorrowBook(ctx context.Context, req *pb.BorrowBookReq
 // @Produce  json
 // @Param   user_id  body   string   true  "User ID"
 // @Param   book_id  body   string   true  "Book ID"
-// @Success 200 {object} pb.ReturnBookResponse "Book returned successfully"
+// @Success 200 {object} map[string]interface{} "Book returned successfully"
 // @Failure 400 {string} string "User ID or Book ID cannot be empty"
 // @Failure 404 {string} string "Book or User not found"
 // @Failure 500 {string} string "Internal server error"
@@ -81,7 +81,7 @@ func (s *BorrowGRPCServer) ReturnBook(ctx context.Context, req *pb.ReturnBookReq
 // @Accept  json
 // @Produce  json
 // @Param   user_id  body   string   true  "User ID"
-// @Success 200 {object} pb.GetUserBorrowsResponse "List of borrowed books retrieved successfully"
+// @Success 200 {object} map[string]interface{} "List of borrowed books retrieved successfully"
 // @Failure 400 {string} string "User ID cannot be empty"
 // @Failure 404 {string} string "No borrow records found for this user"
 // @Failure 500 {string} string "Internal server error"

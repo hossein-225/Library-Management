@@ -4,7 +4,7 @@
         "description": "API documentation for the Library Management system",
         "title": "Library Management API",
         "contact": {},
-        "version": "1.0"
+        "version": "0.0.6"
     },
     "host": "localhost:8080",
     "basePath": "/",

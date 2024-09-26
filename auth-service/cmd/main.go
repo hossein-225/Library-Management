@@ -15,6 +15,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// @title Library Management API - auth-service
+// @version 0.0.6
+// @description API documentation for the Library Management system - auth-service
+
+// @host auth-service:50054
+// @BasePath /
 func main() {
 	repo := repository.NewJWTAuthRepository()
 	service := application.NewAuthService(repo)

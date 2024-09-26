@@ -1,10 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "user-service",
-        "version": "0.4.0",
-        "contact": {}
+        "description": "API documentation for the Library Management system - user-service",
+        "title": "Library Management API - user-service",
+        "contact": {},
+        "version": "0.0.6"
     },
+    "host": "user-service:50052",
+    "basePath": "/",
     "paths": {
         "/users/authenticate": {
             "post": {
@@ -43,7 +46,8 @@
                     "200": {
                         "description": "User authenticated successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.AuthenticateUserResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -87,7 +91,8 @@
                     "200": {
                         "description": "Profile retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.GetUserProfileResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -155,7 +160,8 @@
                     "200": {
                         "description": "Profile updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.UpdateUserProfileResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -225,7 +231,8 @@
                     "200": {
                         "description": "User registered successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.RegisterUserResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -240,54 +247,6 @@
                             "type": "string"
                         }
                     }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "proto.AuthenticateUserResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.GetUserProfileResponse": {
-            "type": "object",
-            "properties": {
-                "user": {
-                    "$ref": "#/definitions/proto.User"
-                }
-            }
-        },
-        "proto.RegisterUserResponse": {
-            "type": "object",
-            "properties": {
-                "user": {
-                    "$ref": "#/definitions/proto.User"
-                }
-            }
-        },
-        "proto.UpdateUserProfileResponse": {
-            "type": "object",
-            "properties": {
-                "user": {
-                    "$ref": "#/definitions/proto.User"
-                }
-            }
-        },
-        "proto.User": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         }

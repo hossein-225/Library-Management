@@ -1,10 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "borrow-service",
-        "version": "0.4.0",
-        "contact": {}
+        "description": "API documentation for the Library Management system - borrow-service",
+        "title": "Library Management API - borrow-service",
+        "contact": {},
+        "version": "0.0.6"
     },
+    "host": "borrow-service:50053",
+    "basePath": "/",
     "paths": {
         "/borrow": {
             "post": {
@@ -43,7 +46,8 @@
                     "200": {
                         "description": "Book borrowed successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.BorrowBookResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -95,7 +99,8 @@
                     "200": {
                         "description": "List of borrowed books retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.GetUserBorrowsResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -156,7 +161,8 @@
                     "200": {
                         "description": "Book returned successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.ReturnBookResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -177,52 +183,6 @@
                             "type": "string"
                         }
                     }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "proto.Borrow": {
-            "type": "object",
-            "properties": {
-                "book_id": {
-                    "type": "string"
-                },
-                "borrowed": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.BorrowBookResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.GetUserBorrowsResponse": {
-            "type": "object",
-            "properties": {
-                "borrows": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/proto.Borrow"
-                    }
-                }
-            }
-        },
-        "proto.ReturnBookResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
                 }
             }
         }

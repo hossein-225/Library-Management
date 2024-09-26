@@ -52,7 +52,8 @@ const docTemplate = `{
                     "200": {
                         "description": "Book borrowed successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.BorrowBookResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -104,7 +105,8 @@ const docTemplate = `{
                     "200": {
                         "description": "List of borrowed books retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.GetUserBorrowsResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -165,7 +167,8 @@ const docTemplate = `{
                     "200": {
                         "description": "Book returned successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.ReturnBookResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -189,63 +192,17 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "definitions": {
-        "proto.Borrow": {
-            "type": "object",
-            "properties": {
-                "book_id": {
-                    "type": "string"
-                },
-                "borrowed": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.BorrowBookResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.GetUserBorrowsResponse": {
-            "type": "object",
-            "properties": {
-                "borrows": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/proto.Borrow"
-                    }
-                }
-            }
-        },
-        "proto.ReturnBookResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "0.0.6",
+	Host:             "borrow-service:50053",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Library Management API - borrow-service",
+	Description:      "API documentation for the Library Management system - borrow-service",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

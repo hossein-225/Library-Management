@@ -20,6 +20,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// @title Library Management API - user-service
+// @version 0.0.6
+// @description API documentation for the Library Management system - user-service
+
+// @host user-service:50052
+// @BasePath /
 func main() {
 	db, err := sql.Open("postgres", "user=postgres password=password dbname=user_db sslmode=disable")
 	if err != nil {

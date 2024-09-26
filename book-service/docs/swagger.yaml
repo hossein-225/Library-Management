@@ -1,43 +1,10 @@
-definitions:
-  proto.AddBookResponse:
-    properties:
-      book:
-        $ref: '#/definitions/proto.Book'
-    type: object
-  proto.Book:
-    properties:
-      author:
-        type: string
-      available:
-        type: boolean
-      category:
-        type: string
-      id:
-        type: string
-      title:
-        type: string
-    type: object
-  proto.DeleteBookResponse:
-    properties:
-      message:
-        type: string
-    type: object
-  proto.ListBooksResponse:
-    properties:
-      books:
-        items:
-          $ref: '#/definitions/proto.Book'
-        type: array
-    type: object
-  proto.UpdateBookResponse:
-    properties:
-      book:
-        $ref: '#/definitions/proto.Book'
-    type: object
+basePath: /
+host: book-service:50051
 info:
-  title: "book-service"
-  version: "0.4.0"
   contact: {}
+  description: API documentation for the Library Management system - book-service
+  title: Library Management API - book-service
+  version: 0.0.6
 paths:
   /books:
     get:
@@ -50,7 +17,8 @@ paths:
         "200":
           description: List of books retrieved successfully
           schema:
-            $ref: '#/definitions/proto.ListBooksResponse'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal server error
           schema:
@@ -87,7 +55,8 @@ paths:
         "200":
           description: Book added successfully
           schema:
-            $ref: '#/definitions/proto.AddBookResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: Title, author, or category cannot be empty
           schema:
@@ -116,7 +85,8 @@ paths:
         "200":
           description: Book deleted successfully
           schema:
-            $ref: '#/definitions/proto.DeleteBookResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: Book ID cannot be empty
           schema:
@@ -173,7 +143,8 @@ paths:
         "200":
           description: Book updated successfully
           schema:
-            $ref: '#/definitions/proto.UpdateBookResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: ID, title, author, or category cannot be empty
           schema:

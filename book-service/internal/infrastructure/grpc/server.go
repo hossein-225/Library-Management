@@ -27,7 +27,7 @@ func NewBookGRPCServer(service *application.BookService) *BookGRPCServer {
 // @Tags books
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} pb.ListBooksResponse "List of books retrieved successfully"
+// @Success 200 {object} map[string]interface{} "List of books retrieved successfully"
 // @Failure 500 {string} string "Internal server error"
 // @Router /books [get]
 func (s *BookGRPCServer) ListBooks(ctx context.Context, req *pb.ListBooksRequest) (*pb.ListBooksResponse, error) {
@@ -59,7 +59,7 @@ func (s *BookGRPCServer) ListBooks(ctx context.Context, req *pb.ListBooksRequest
 // @Param   title     body   string   true  "Title of the book"
 // @Param   author    body   string   true  "Author of the book"
 // @Param   category  body   string   true  "Category of the book"
-// @Success 200 {object} pb.AddBookResponse "Book added successfully"
+// @Success 200 {object} map[string]interface{} "Book added successfully"
 // @Failure 400 {string} string "Title, author, or category cannot be empty"
 // @Failure 500 {string} string "Internal server error"
 // @Router /books [post]
@@ -102,7 +102,7 @@ func (s *BookGRPCServer) AddBook(ctx context.Context, req *pb.AddBookRequest) (*
 // @Param   author    body   string   true  "Author of the book"
 // @Param   category  body   string   true  "Category of the book"
 // @Param   available body   bool     true  "Availability status of the book"
-// @Success 200 {object} pb.UpdateBookResponse "Book updated successfully"
+// @Success 200 {object} map[string]interface{} "Book updated successfully"
 // @Failure 400 {string} string "ID, title, author, or category cannot be empty"
 // @Failure 404 {string} string "Book not found"
 // @Failure 500 {string} string "Internal server error"
@@ -142,7 +142,7 @@ func (s *BookGRPCServer) UpdateBook(ctx context.Context, req *pb.UpdateBookReque
 // @Accept  json
 // @Produce  json
 // @Param   id  path   string   true  "ID of the book to delete"
-// @Success 200 {object} pb.DeleteBookResponse "Book deleted successfully"
+// @Success 200 {object} map[string]interface{} "Book deleted successfully"
 // @Failure 400 {string} string "Book ID cannot be empty"
 // @Failure 404 {string} string "Book not found"
 // @Failure 500 {string} string "Internal server error"
@@ -162,21 +162,21 @@ func (s *BookGRPCServer) DeleteBook(ctx context.Context, req *pb.DeleteBookReque
 }
 
 func (s *BookGRPCServer) SearchBooks(ctx context.Context, req *pb.SearchBooksRequest) (*pb.SearchBooksResponse, error) {
-    books, err := s.service.SearchBooks(ctx, req.Title, req.Author, req.Category)
-    if err != nil {
-        return nil, err
-    }
+	books, err := s.service.SearchBooks(ctx, req.Title, req.Author, req.Category)
+	if err != nil {
+		return nil, err
+	}
 
-    var response pb.SearchBooksResponse
-    for _, book := range books {
-        response.Books = append(response.Books, &pb.Book{
-            Id:        book.ID,
-            Title:     book.Title,
-            Author:    book.Author,
-            Category:  book.Category,
-            Available: book.Available,
-        })
-    }
+	var response pb.SearchBooksResponse
+	for _, book := range books {
+		response.Books = append(response.Books, &pb.Book{
+			Id:        book.ID,
+			Title:     book.Title,
+			Author:    book.Author,
+			Category:  book.Category,
+			Available: book.Available,
+		})
+	}
 
-    return &response, nil
+	return &response, nil
 }

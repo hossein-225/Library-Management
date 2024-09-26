@@ -32,7 +32,8 @@ const docTemplate = `{
                     "200": {
                         "description": "List of books retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.ListBooksResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
@@ -88,7 +89,8 @@ const docTemplate = `{
                     "200": {
                         "description": "Book added successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.AddBookResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -170,7 +172,8 @@ const docTemplate = `{
                     "200": {
                         "description": "Book updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.UpdateBookResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -218,7 +221,8 @@ const docTemplate = `{
                     "200": {
                         "description": "Book deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/proto.DeleteBookResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -242,74 +246,17 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "definitions": {
-        "proto.AddBookResponse": {
-            "type": "object",
-            "properties": {
-                "book": {
-                    "$ref": "#/definitions/proto.Book"
-                }
-            }
-        },
-        "proto.Book": {
-            "type": "object",
-            "properties": {
-                "author": {
-                    "type": "string"
-                },
-                "available": {
-                    "type": "boolean"
-                },
-                "category": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.DeleteBookResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.ListBooksResponse": {
-            "type": "object",
-            "properties": {
-                "books": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/proto.Book"
-                    }
-                }
-            }
-        },
-        "proto.UpdateBookResponse": {
-            "type": "object",
-            "properties": {
-                "book": {
-                    "$ref": "#/definitions/proto.Book"
-                }
-            }
-        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "0.0.6",
+	Host:             "book-service:50051",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Library Management API - book-service",
+	Description:      "API documentation for the Library Management system - book-service",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
