@@ -26,18 +26,16 @@ func (r *JWTAuthRepository) GenerateToken(userID string, role pb.Role) (string, 
 	return utils.GenerateJWT(userID, strRole)
 }
 
-func (r *JWTAuthRepository) ValidateToken(tokenString string) (string, error) {
+func (r *JWTAuthRepository) ValidateToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return utils.JwtSecret, nil
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := claims["userID"].(string)
-		return userID, nil
-	} else {
-		return "", errors.New("invalid token")
+		return claims, nil
 	}
+	return nil, errors.New("invalid token")
 }

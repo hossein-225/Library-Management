@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/hossein-225/Library-Management/auth-service/internal/application"
 	"github.com/hossein-225/Library-Management/auth-service/internal/domain"
 	"github.com/hossein-225/Library-Management/auth-service/pkg/utils"
@@ -36,9 +37,13 @@ func TestValidateToken(t *testing.T) {
 	}
 	service := application.NewAuthService(repo)
 
-	userID, err := service.ValidateToken(context.Background(), "valid_token")
+	claims, err := service.ValidateToken(context.Background(), "valid_token")
 
 	assert.NoError(t, err)
+
+	userID, ok := claims["userID"].(string)
+	assert.True(t, ok)
+
 	assert.Equal(t, "user123", userID)
 
 	_, err = service.ValidateToken(context.Background(), "invalid_token")
@@ -61,9 +66,12 @@ func (m *MockAuthRepository) GenerateToken(userID string, role proto.Role) (stri
 	return utils.GenerateJWT(userID, strRole)
 }
 
-func (m *MockAuthRepository) ValidateToken(token string) (string, error) {
+func (m *MockAuthRepository) ValidateToken(token string) (jwt.MapClaims, error) {
 	if token == m.ValidToken {
-		return m.UserID, nil
+		claims := jwt.MapClaims{
+			"userID": m.UserID,
+		}
+		return claims, nil
 	}
-	return "", domain.ErrInvalidToken
+	return nil, domain.ErrInvalidToken
 }

@@ -46,13 +46,14 @@ func (s *AuthGRPCServer) GenerateToken(ctx context.Context, req *pb.GenerateToke
 
 // ValidateToken
 // @Summary Validate a JWT token
-// @Description Validates the provided JWT token and returns the associated user ID
+// @Description Validates the provided JWT token and returns the associated user ID and role
 // @Tags auth
 // @Accept  json
 // @Produce  json
 // @Param   token  body   string   true  "JWT token"
 // @Success 200 {object} pb.ValidateTokenResponse "Token validated successfully"
 // @Failure 400 {string} string "Token cannot be empty or is invalid"
+// @Failure 401 {string} string "Invalid token: missing userID or role"
 // @Failure 500 {string} string "Internal server error"
 // @Router /auth/validate [post]
 func (s *AuthGRPCServer) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
@@ -60,10 +61,20 @@ func (s *AuthGRPCServer) ValidateToken(ctx context.Context, req *pb.ValidateToke
 		return nil, status.Errorf(codes.InvalidArgument, "Token cannot be empty")
 	}
 
-	userID, err := s.service.ValidateToken(ctx, req.Token)
+	claims, err := s.service.ValidateToken(ctx, req.Token)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to validate token: %v", err)
 	}
 
-	return &pb.ValidateTokenResponse{UserId: userID}, nil
+	userID, ok := claims["userID"].(string)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "Invalid token: missing userID")
+	}
+
+	role, ok := claims["role"].(pb.Role)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "Invalid token: missing role")
+	}
+
+	return &pb.ValidateTokenResponse{UserId: userID, Role: role}, nil
 }

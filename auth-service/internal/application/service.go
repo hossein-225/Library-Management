@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/hossein-225/Library-Management/auth-service/internal/domain"
 	pb "github.com/hossein-225/Library-Management/auth-service/proto"
 )
@@ -19,6 +20,6 @@ func (s *AuthService) GenerateToken(ctx context.Context, userID string, role pb.
 	return s.repo.GenerateToken(userID, role)
 }
 
-func (s *AuthService) ValidateToken(ctx context.Context, token string) (string, error) {
+func (s *AuthService) ValidateToken(ctx context.Context, token string) (jwt.MapClaims, error) {
 	return s.repo.ValidateToken(token)
 }
