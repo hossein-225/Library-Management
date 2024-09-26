@@ -29,3 +29,7 @@ func (s *BookService) UpdateBook(ctx context.Context, book *domain.Book) error {
 func (s *BookService) DeleteBook(ctx context.Context, id string) error {
 	return s.repo.DeleteBook(id)
 }
+
+func (s *BookService) SearchBooks(ctx context.Context, title, author, category string) ([]*domain.Book, error) {
+	return s.repo.SearchBooks(title, author, category)
+}

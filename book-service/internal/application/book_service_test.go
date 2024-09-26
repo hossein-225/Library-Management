@@ -52,6 +52,10 @@ type MockBookRepository struct {
 	AddedBook *domain.Book
 }
 
+func (m *MockBookRepository) SearchBooks(title string, author string, category string) ([]*domain.Book, error) {
+	panic("unimplemented")
+}
+
 func (m *MockBookRepository) ListBooks() ([]*domain.Book, error) {
 	return m.Books, nil
 }

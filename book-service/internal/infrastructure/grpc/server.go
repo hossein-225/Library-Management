@@ -160,3 +160,23 @@ func (s *BookGRPCServer) DeleteBook(ctx context.Context, req *pb.DeleteBookReque
 		Message: "Book deleted successfully",
 	}, nil
 }
+
+func (s *BookGRPCServer) SearchBooks(ctx context.Context, req *pb.SearchBooksRequest) (*pb.SearchBooksResponse, error) {
+    books, err := s.service.SearchBooks(ctx, req.Title, req.Author, req.Category)
+    if err != nil {
+        return nil, err
+    }
+
+    var response pb.SearchBooksResponse
+    for _, book := range books {
+        response.Books = append(response.Books, &pb.Book{
+            Id:        book.ID,
+            Title:     book.Title,
+            Author:    book.Author,
+            Category:  book.Category,
+            Available: book.Available,
+        })
+    }
+
+    return &response, nil
+}
