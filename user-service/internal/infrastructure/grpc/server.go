@@ -43,6 +43,7 @@ func (s *UserGRPCServer) RegisterUser(ctx context.Context, req *pb.RegisterUserR
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
+		Role:     "user",
 	}
 
 	if err := s.service.RegisterUser(ctx, user); err != nil {
@@ -54,6 +55,7 @@ func (s *UserGRPCServer) RegisterUser(ctx context.Context, req *pb.RegisterUserR
 			Id:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
+			Role:  user.Role,
 		},
 	}, nil
 }
@@ -80,7 +82,7 @@ func (s *UserGRPCServer) AuthenticateUser(ctx context.Context, req *pb.Authentic
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
 	}
 
-	token, err := utils.GenerateJWT(user.ID)
+	token, err := utils.GenerateJWT(user.ID, user.Role)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to generate token")
 	}

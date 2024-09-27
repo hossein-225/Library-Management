@@ -8,6 +8,7 @@ import (
 	"github.com/hossein-225/Library-Management/user-service/internal/application"
 	user_grpc "github.com/hossein-225/Library-Management/user-service/internal/infrastructure/grpc"
 	"github.com/hossein-225/Library-Management/user-service/internal/infrastructure/repository"
+	"github.com/hossein-225/Library-Management/user-service/pkg/utils"
 	pb "github.com/hossein-225/Library-Management/user-service/proto"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -63,7 +64,7 @@ func main() {
 
 func createAdminIfNotExists(db *sql.DB) {
 	var count int
-	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE role = 'admin'").Scan(&count)
+	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE email = 'admin@example.com'").Scan(&count)
 	if err != nil {
 		log.Fatalf("Failed to check for admin account: %v", err)
 	}
@@ -74,7 +75,9 @@ func createAdminIfNotExists(db *sql.DB) {
 			log.Fatalf("Failed to hash admin password: %v", err)
 		}
 
-		_, err = db.Exec("INSERT INTO users (email, password, role) VALUES ($1, $2, $3)", "admin@example.com", string(hashedPassword), "admin")
+		id := utils.GenerateUUID()
+
+		_, err = db.Exec("INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)", id, "admin", "admin@example.com", string(hashedPassword), "admin")
 		if err != nil {
 			log.Fatalf("Failed to create admin user: %v", err)
 		}

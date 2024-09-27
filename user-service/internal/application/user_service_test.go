@@ -18,6 +18,7 @@ func TestRegisterUser(t *testing.T) {
 		Name:     "Test User",
 		Email:    "test@example.com",
 		Password: "password",
+		Role:     "user",
 	}
 
 	err := service.RegisterUser(context.Background(), user)
@@ -34,6 +35,7 @@ func TestAuthenticateUser(t *testing.T) {
 				Name:     "Test User",
 				Email:    "test@example.com",
 				Password: "password",
+				Role:     "user",
 			},
 		},
 	}

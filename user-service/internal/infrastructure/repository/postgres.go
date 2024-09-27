@@ -21,13 +21,19 @@ func (r *PostgresUserRepository) RegisterUser(user *domain.User) error {
 		return err
 	}
 
-	_, err = r.db.Exec("INSERT INTO users (id, name, email, password) VALUES ($1, $2, $3, $4)", user.ID, user.Name, user.Email, string(hashedPassword))
+	_, err = r.db.Exec("INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)", user.ID, user.Name, user.Email, string(hashedPassword), user.Role)
 	return err
 }
 
 func (r *PostgresUserRepository) AuthenticateUser(email, password string) (*domain.User, error) {
 	user := &domain.User{}
-	err := r.db.QueryRow("SELECT id, name, email, password FROM users WHERE email=$1", email).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := r.db.QueryRow("SELECT id, name, email, password, role FROM users WHERE email=$1", email).
+		Scan(
+			&user.ID,
+			&user.Name,
+			&user.Email,
+			&user.Password,
+			&user.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +48,12 @@ func (r *PostgresUserRepository) AuthenticateUser(email, password string) (*doma
 
 func (r *PostgresUserRepository) GetUserProfile(id string) (*domain.User, error) {
 	user := &domain.User{}
-	err := r.db.QueryRow("SELECT id, name, email FROM users WHERE id=$1", id).Scan(&user.ID, &user.Name, &user.Email)
+	err := r.db.QueryRow("SELECT id, name, email, role FROM users WHERE id=$1", id).
+		Scan(
+			&user.ID,
+			&user.Name,
+			&user.Email,
+			&user.Role)
 	if err != nil {
 		return nil, err
 	}
