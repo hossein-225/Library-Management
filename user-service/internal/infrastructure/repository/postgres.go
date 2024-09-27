@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/hossein-225/Library-Management/user-service/internal/domain"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type PostgresUserRepository struct {
@@ -15,16 +16,27 @@ func NewPostgresUserRepository(db *sql.DB) *PostgresUserRepository {
 }
 
 func (r *PostgresUserRepository) RegisterUser(user *domain.User) error {
-	_, err := r.db.Exec("INSERT INTO users (id, name, email, password) VALUES ($1, $2, $3, $4)", user.ID, user.Name, user.Email, user.Password)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.Exec("INSERT INTO users (id, name, email, password) VALUES ($1, $2, $3, $4)", user.ID, user.Name, user.Email, string(hashedPassword))
 	return err
 }
 
 func (r *PostgresUserRepository) AuthenticateUser(email, password string) (*domain.User, error) {
 	user := &domain.User{}
-	err := r.db.QueryRow("SELECT id, name, email, password FROM users WHERE email=$1 AND password=$2", email, password).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := r.db.QueryRow("SELECT id, name, email, password FROM users WHERE email=$1", email).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 	if err != nil {
 		return nil, err
 	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, err
+	}
+
 	return user, nil
 }
 
