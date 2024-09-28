@@ -3,9 +3,11 @@ package main
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hossein-225/Library-Management/user-service/internal/application"
+	"github.com/hossein-225/Library-Management/user-service/internal/domain"
 	user_grpc "github.com/hossein-225/Library-Management/user-service/internal/infrastructure/grpc"
 	"github.com/hossein-225/Library-Management/user-service/internal/infrastructure/repository"
 	"github.com/hossein-225/Library-Management/user-service/pkg/utils"
@@ -13,6 +15,8 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	"net"
 
@@ -28,11 +32,10 @@ import (
 // @host user-service:50052
 // @BasePath /
 func main() {
-	db, err := sql.Open("postgres", "user=postgres password=password dbname=user_db sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+	db := configDB()
 	defer db.Close()
+
+	log.Println("connect to postgresql successfully")
 
 	repo := repository.NewPostgresUserRepository(db)
 	service := application.NewUserService(repo)
@@ -62,6 +65,34 @@ func main() {
 	router.Run(":8080")
 }
 
+func configDB() *sql.DB {
+	client, err := gorm.Open(postgres.Open("postgres://"+os.Getenv("PG_USER")+
+		":"+os.Getenv("PG_PASSWORD")+"@"+os.Getenv("PG_URL")+":"+
+		os.Getenv("PG_PORT")+"/"+os.Getenv("PG_NAME")), &gorm.Config{})
+	if err != nil {
+		log.Println("couldn't connect to postgresql DB", err)
+		log.Fatal(err)
+	}
+
+	var sqlDB *sql.DB
+	sqlDB, err = client.DB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = configModels(client)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = sqlDB.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return sqlDB
+}
+
 func createAdminIfNotExists(db *sql.DB) {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE email = 'admin@example.com'").Scan(&count)
@@ -86,4 +117,18 @@ func createAdminIfNotExists(db *sql.DB) {
 	} else {
 		log.Println("Admin account already exists.")
 	}
+}
+
+func configModels(client *gorm.DB) error {
+
+	err := client.AutoMigrate(&domain.User{})
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	log.Println("Table Created")
+
+	return nil
+
 }

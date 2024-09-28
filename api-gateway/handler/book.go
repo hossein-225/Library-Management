@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"context"
@@ -17,14 +17,14 @@ import (
 // @Success 200 {array} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Router /books [get]
-func handleBookList(c *gin.Context) {
+func HandleBookList(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
 
-	_, _, err := authenticateUser(c.Request.Context(), token)
+	_, _, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -67,14 +67,14 @@ func fetchBooks(ctx context.Context) ([]*bookpb.Book, error) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Router /books [post]
-func handleAddBook(c *gin.Context) {
+func HandleAddBook(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
 
-	_, isAdmin, err := authenticateUser(c.Request.Context(), token)
+	_, isAdmin, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil || !isAdmin {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: Admins only"})
 		return
@@ -123,14 +123,14 @@ func addBook(ctx context.Context, title, author, category string) error {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Router /books/{id} [put]
-func handleUpdateBook(c *gin.Context) {
+func HandleUpdateBook(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
 
-	_, isAdmin, err := authenticateUser(c.Request.Context(), token)
+	_, isAdmin, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil || !isAdmin {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: Admins only"})
 		return
@@ -174,14 +174,14 @@ func updateBook(ctx context.Context, bookID string, c *gin.Context) error {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Router /books/{id} [delete]
-func handleDeleteBook(c *gin.Context) {
+func HandleDeleteBook(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
 
-	_, isAdmin, err := authenticateUser(c.Request.Context(), token)
+	_, isAdmin, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil || !isAdmin {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: Admins only"})
 		return

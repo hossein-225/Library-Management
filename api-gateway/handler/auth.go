@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func authenticateUser(ctx context.Context, token string) (string, bool, error) {
+func AuthenticateUser(ctx context.Context, token string) (string, bool, error) {
 	conn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
 	if err != nil {
 		return "", false, err

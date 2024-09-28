@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 
-RUN apk add git
+RUN apk add --no-cache git
 
 WORKDIR /app
 
@@ -10,8 +10,7 @@ RUN go mod download
 
 COPY . .
 
-# RUN CGO_ENABLED=0 GOOS=linux go build -o /book-service ./cmd/main.go
-RUN go build -o /book-service ./cmd/main.go
+RUN go build -o /entrypoint /app/cmd/main.go
 
 FROM alpine:latest AS runtime
 
@@ -19,8 +18,8 @@ LABEL maintainer="SeyedHossein HosseiniMotlagh <hossein_225@yahoo.com>"
 
 WORKDIR /app
 
-COPY --from=builder /book-service .
+COPY --from=builder /entrypoint .
 
 EXPOSE 50051
 
-ENTRYPOINT ["./book-service"]
+ENTRYPOINT ["/app/entrypoint"]

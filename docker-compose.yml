@@ -1,5 +1,6 @@
 services:
   api-gateway:
+    container_name: api-gateway
     build: ./api-gateway
     ports:
       - "8080:8080"
@@ -12,84 +13,140 @@ services:
       - library-network
 
   book-service:
+    container_name: book-service
     build: ./book-service
-    ports:
-      - "50051:50051"
+    # ports:
+    #   - "50051:50051"
+    environment:
+      PG_URL: book-db
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: password
+      PG_NAME: book_db
     networks:
       - library-network
     depends_on:
       - book-db
 
   user-service:
+    container_name: user-service
     build: ./user-service
-    ports:
-      - "50052:50052"
+    # ports:
+    #   - "50052:50052"
+    environment:
+      PG_URL: user-db
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: password
+      PG_NAME: user_db
     networks:
       - library-network
     depends_on:
       - user-db
 
   borrow-service:
+    container_name: borrow-service
     build: ./borrow-service
-    ports:
-      - "50053:50053"
+    # ports:
+    #   - "50053:50053"
+    environment:
+      PG_URL: borrow-db
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: password
+      PG_NAME: borrow_db
     networks:
       - library-network
     depends_on:
       - borrow-db
 
   auth-service:
+    container_name: auth-service
     build: ./auth-service
-    ports:
-      - "50054:50054"
+    # ports:
+    #   - "50054:50054"
+    environment:
+      PG_URL: auth-db
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: password
+      PG_NAME: users_db
     networks:
       - library-network
-    depends_on:
-      - auth-db
+    # depends_on:
+    #   - auth-db
 
   book-db:
     image: postgres:13
+    container_name: book-db
+    restart: always
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "book_db", "-U", "postgres" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: book_db
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     networks:
       - library-network
 
   user-db:
     image: postgres:13
+    container_name: user-db
+    restart: always
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "user_db", "-U", "postgres" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: user_db
-    ports:
-      - "5433:5432"
+    # ports:
+    #   - "5433:5432"
     networks:
       - library-network
 
   borrow-db:
     image: postgres:13
+    container_name: borrow-db
+    restart: always
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "borrow_db", "-U", "postgres" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: borrow_db
-    ports:
-      - "5434:5432"
+    # ports:
+    #   - "5434:5432"
     networks:
       - library-network
 
-  auth-db:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: auth_db
-    ports:
-      - "5435:5432"
-    networks:
-      - library-network
+  # auth-db:
+  #   image: postgres:13
+  #   container_name: auth-db
+  #   restart: always
+  #   healthcheck:
+  #     test: [ "CMD", "pg_isready", "-q", "-d", "auth_db", "-U", "postgres" ]
+  #     timeout: 45s
+  #     interval: 10s
+  #     retries: 10
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: auth_db
+  #   # ports:
+  #   #   - "5435:5432"
+  #   networks:
+  #     - library-network
 
 networks:
   library-network:

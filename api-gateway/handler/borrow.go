@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"context"
@@ -18,14 +18,14 @@ import (
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Router /borrow [post]
-func handleBorrowBook(c *gin.Context) {
+func HandleBorrowBook(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
 
-	userID, _, err := authenticateUser(c.Request.Context(), token)
+	userID, _, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -68,14 +68,14 @@ func borrowBook(ctx context.Context, userID, bookID string) error {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Router /return [post]
-func handleReturnBook(c *gin.Context) {
+func HandleReturnBook(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
 
-	userID, _, err := authenticateUser(c.Request.Context(), token)
+	userID, _, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return

@@ -10,8 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /borrow-service ./cmd/main.go
-# RUN go build -o /borrow-service ./cmd/main.go
+RUN go build -o /entrypoint /app/cmd/main.go
 
 FROM alpine:latest AS runtime
 
@@ -19,8 +18,8 @@ LABEL maintainer="SeyedHossein HosseiniMotlagh <hossein_225@yahoo.com>"
 
 WORKDIR /app
 
-COPY --from=builder /borrow-service .
+COPY --from=builder /entrypoint .
 
 EXPOSE 50053
 
-ENTRYPOINT ["./borrow-service"]
+ENTRYPOINT ["/app/entrypoint"]

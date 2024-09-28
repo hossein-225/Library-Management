@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Router /register [post]
-func handleUserRegister(c *gin.Context) {
+func HandleUserRegister(c *gin.Context) {
 	name := c.PostForm("name")
 	email := c.PostForm("email")
 	password := c.PostForm("password")
@@ -62,7 +62,7 @@ func registerUser(ctx context.Context, name, email, password string) error {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Router /login [post]
-func handleUserLogin(c *gin.Context) {
+func HandleUserLogin(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
