@@ -17,7 +17,7 @@ import (
 // @Param book_id formData string true "Book ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
-// @Router /borrow [post]
+// @Router /books/borrow [post]
 func HandleBorrowBook(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
@@ -67,7 +67,7 @@ func borrowBook(ctx context.Context, userID, bookID string) error {
 // @Param book_id formData string true "Book ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
-// @Router /return [post]
+// @Router /books/return [post]
 func HandleReturnBook(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {

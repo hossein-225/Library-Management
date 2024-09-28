@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/hossein-225/Library-Management/api-gateway/docs"
 	"github.com/hossein-225/Library-Management/api-gateway/handler"
+	cors "github.com/hossein-225/Library-Management/api-gateway/middleware"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -21,22 +22,35 @@ func main() {
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	router.GET("/books", handler.HandleBookList)
-	router.POST("/books", handler.HandleAddBook)
-	router.PUT("/books/:id", handler.HandleUpdateBook)
-	router.DELETE("/books/:id", handler.HandleDeleteBook)
-
-	router.POST("/register", handler.HandleUserRegister)
-	router.POST("/login", handler.HandleUserLogin)
-
-	router.POST("/borrow", handler.HandleBorrowBook)
-	router.POST("/return", handler.HandleReturnBook)
+	router.Use(cors.CORSMiddleware())
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
+
+	v1 := router.Group("/v1")
+	{
+
+		books := v1.Group("/books")
+		{
+			books.GET("", handler.HandleBookList)
+			books.POST("", handler.HandleAddBook)
+			books.PUT("/:id", handler.HandleUpdateBook)
+			books.DELETE("/:id", handler.HandleDeleteBook)
+
+			books.POST("/borrow", handler.HandleBorrowBook)
+			books.POST("/return", handler.HandleReturnBook)
+		}
+
+		users := v1.Group("/users")
+		{
+			users.POST("/register", handler.HandleUserRegister)
+			users.POST("/login", handler.HandleUserLogin)
+		}
+
+	}
 
 	log.Println("API Gateway running on port 8080")
 	router.Run(":8080")

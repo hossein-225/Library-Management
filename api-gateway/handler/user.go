@@ -19,7 +19,7 @@ import (
 // @Param password formData string true "User password"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
-// @Router /register [post]
+// @Router /users/register [post]
 func HandleUserRegister(c *gin.Context) {
 	name := c.PostForm("name")
 	email := c.PostForm("email")
@@ -61,7 +61,7 @@ func registerUser(ctx context.Context, name, email, password string) error {
 // @Param password formData string true "User password"
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
-// @Router /login [post]
+// @Router /users/login [post]
 func HandleUserLogin(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")

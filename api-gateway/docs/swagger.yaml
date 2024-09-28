@@ -130,7 +130,7 @@ paths:
       summary: Update a book
       tags:
       - books
-  /borrow:
+  /books/borrow:
     post:
       consumes:
       - application/json
@@ -157,7 +157,34 @@ paths:
       summary: Borrow a book
       tags:
       - borrow
-  /login:
+  /books/return:
+    post:
+      consumes:
+      - application/json
+      description: Return a borrowed book to the library
+      parameters:
+      - description: Book ID
+        in: formData
+        name: book_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Return a book
+      tags:
+      - borrow
+  /users/login:
     post:
       consumes:
       - application/json
@@ -189,7 +216,7 @@ paths:
       summary: Login user
       tags:
       - users
-  /register:
+  /users/register:
     post:
       consumes:
       - application/json
@@ -226,31 +253,4 @@ paths:
       summary: Register a new user
       tags:
       - users
-  /return:
-    post:
-      consumes:
-      - application/json
-      description: Return a borrowed book to the library
-      parameters:
-      - description: Book ID
-        in: formData
-        name: book_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Return a book
-      tags:
-      - borrow
 swagger: "2.0"
