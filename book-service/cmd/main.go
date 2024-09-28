@@ -91,7 +91,7 @@ func configDB() *sql.DB {
 
 func ConfigModels(client *gorm.DB) error {
 
-	err := client.AutoMigrate(&domain.Book{})
+	err := client.Migrator().AutoMigrate(&domain.Book{})
 	if err != nil {
 		log.Println(err)
 		return err

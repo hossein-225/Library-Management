@@ -19,11 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BookService_ListBooks_FullMethodName   = "/book.BookService/ListBooks"
-	BookService_AddBook_FullMethodName     = "/book.BookService/AddBook"
-	BookService_UpdateBook_FullMethodName  = "/book.BookService/UpdateBook"
-	BookService_DeleteBook_FullMethodName  = "/book.BookService/DeleteBook"
-	BookService_SearchBooks_FullMethodName = "/book.BookService/SearchBooks"
+	BookService_ListBooks_FullMethodName         = "/book.BookService/ListBooks"
+	BookService_AddBook_FullMethodName           = "/book.BookService/AddBook"
+	BookService_UpdateBook_FullMethodName        = "/book.BookService/UpdateBook"
+	BookService_DeleteBook_FullMethodName        = "/book.BookService/DeleteBook"
+	BookService_SearchBooks_FullMethodName       = "/book.BookService/SearchBooks"
+	BookService_CheckAvailability_FullMethodName = "/book.BookService/CheckAvailability"
+	BookService_UpdateBookStatus_FullMethodName  = "/book.BookService/UpdateBookStatus"
 )
 
 // BookServiceClient is the client API for BookService service.
@@ -35,6 +37,8 @@ type BookServiceClient interface {
 	UpdateBook(ctx context.Context, in *UpdateBookRequest, opts ...grpc.CallOption) (*UpdateBookResponse, error)
 	DeleteBook(ctx context.Context, in *DeleteBookRequest, opts ...grpc.CallOption) (*DeleteBookResponse, error)
 	SearchBooks(ctx context.Context, in *SearchBooksRequest, opts ...grpc.CallOption) (*SearchBooksResponse, error)
+	CheckAvailability(ctx context.Context, in *CheckAvailabilityRequest, opts ...grpc.CallOption) (*CheckAvailabilityResponse, error)
+	UpdateBookStatus(ctx context.Context, in *UpdateBookStatusRequest, opts ...grpc.CallOption) (*UpdateBookStatusResponse, error)
 }
 
 type bookServiceClient struct {
@@ -95,6 +99,26 @@ func (c *bookServiceClient) SearchBooks(ctx context.Context, in *SearchBooksRequ
 	return out, nil
 }
 
+func (c *bookServiceClient) CheckAvailability(ctx context.Context, in *CheckAvailabilityRequest, opts ...grpc.CallOption) (*CheckAvailabilityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckAvailabilityResponse)
+	err := c.cc.Invoke(ctx, BookService_CheckAvailability_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookServiceClient) UpdateBookStatus(ctx context.Context, in *UpdateBookStatusRequest, opts ...grpc.CallOption) (*UpdateBookStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateBookStatusResponse)
+	err := c.cc.Invoke(ctx, BookService_UpdateBookStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BookServiceServer is the server API for BookService service.
 // All implementations must embed UnimplementedBookServiceServer
 // for forward compatibility.
@@ -104,6 +128,8 @@ type BookServiceServer interface {
 	UpdateBook(context.Context, *UpdateBookRequest) (*UpdateBookResponse, error)
 	DeleteBook(context.Context, *DeleteBookRequest) (*DeleteBookResponse, error)
 	SearchBooks(context.Context, *SearchBooksRequest) (*SearchBooksResponse, error)
+	CheckAvailability(context.Context, *CheckAvailabilityRequest) (*CheckAvailabilityResponse, error)
+	UpdateBookStatus(context.Context, *UpdateBookStatusRequest) (*UpdateBookStatusResponse, error)
 	mustEmbedUnimplementedBookServiceServer()
 }
 
@@ -128,6 +154,12 @@ func (UnimplementedBookServiceServer) DeleteBook(context.Context, *DeleteBookReq
 }
 func (UnimplementedBookServiceServer) SearchBooks(context.Context, *SearchBooksRequest) (*SearchBooksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchBooks not implemented")
+}
+func (UnimplementedBookServiceServer) CheckAvailability(context.Context, *CheckAvailabilityRequest) (*CheckAvailabilityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckAvailability not implemented")
+}
+func (UnimplementedBookServiceServer) UpdateBookStatus(context.Context, *UpdateBookStatusRequest) (*UpdateBookStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateBookStatus not implemented")
 }
 func (UnimplementedBookServiceServer) mustEmbedUnimplementedBookServiceServer() {}
 func (UnimplementedBookServiceServer) testEmbeddedByValue()                     {}
@@ -240,6 +272,42 @@ func _BookService_SearchBooks_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BookService_CheckAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckAvailabilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).CheckAvailability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_CheckAvailability_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).CheckAvailability(ctx, req.(*CheckAvailabilityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookService_UpdateBookStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateBookStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).UpdateBookStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_UpdateBookStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).UpdateBookStatus(ctx, req.(*UpdateBookStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BookService_ServiceDesc is the grpc.ServiceDesc for BookService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +334,14 @@ var BookService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchBooks",
 			Handler:    _BookService_SearchBooks_Handler,
+		},
+		{
+			MethodName: "CheckAvailability",
+			Handler:    _BookService_CheckAvailability_Handler,
+		},
+		{
+			MethodName: "UpdateBookStatus",
+			Handler:    _BookService_UpdateBookStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -40,11 +40,11 @@ func (s *BookGRPCServer) ListBooks(ctx context.Context, req *pb.ListBooksRequest
 	var response pb.ListBooksResponse
 	for _, book := range books {
 		response.Books = append(response.Books, &pb.Book{
-			Id:        book.ID,
-			Title:     book.Title,
-			Author:    book.Author,
-			Category:  book.Category,
-			Available: book.Available,
+			Id:       book.ID,
+			Title:    book.Title,
+			Author:   book.Author,
+			Category: book.Category,
+			Status:   book.Status,
 		})
 	}
 
@@ -70,11 +70,11 @@ func (s *BookGRPCServer) AddBook(ctx context.Context, req *pb.AddBookRequest) (*
 	}
 
 	book := &domain.Book{
-		ID:        utils.GenerateUUID(),
-		Title:     req.Title,
-		Author:    req.Author,
-		Category:  req.Category,
-		Available: true,
+		ID:       utils.GenerateUUID(),
+		Title:    req.Title,
+		Author:   req.Author,
+		Category: req.Category,
+		Status:   pb.BookStatus_AVAILABLE,
 	}
 
 	if err := s.service.AddBook(ctx, book); err != nil {
@@ -83,11 +83,11 @@ func (s *BookGRPCServer) AddBook(ctx context.Context, req *pb.AddBookRequest) (*
 
 	return &pb.AddBookResponse{
 		Book: &pb.Book{
-			Id:        book.ID,
-			Title:     book.Title,
-			Author:    book.Author,
-			Category:  book.Category,
-			Available: book.Available,
+			Id:       book.ID,
+			Title:    book.Title,
+			Author:   book.Author,
+			Category: book.Category,
+			Status:   book.Status,
 		},
 	}, nil
 }
@@ -114,11 +114,10 @@ func (s *BookGRPCServer) UpdateBook(ctx context.Context, req *pb.UpdateBookReque
 	}
 
 	book := &domain.Book{
-		ID:        req.Id,
-		Title:     req.Title,
-		Author:    req.Author,
-		Category:  req.Category,
-		Available: req.Available,
+		ID:       req.Id,
+		Title:    req.Title,
+		Author:   req.Author,
+		Category: req.Category,
 	}
 
 	if err := s.service.UpdateBook(ctx, book); err != nil {
@@ -127,11 +126,10 @@ func (s *BookGRPCServer) UpdateBook(ctx context.Context, req *pb.UpdateBookReque
 
 	return &pb.UpdateBookResponse{
 		Book: &pb.Book{
-			Id:        book.ID,
-			Title:     book.Title,
-			Author:    book.Author,
-			Category:  book.Category,
-			Available: book.Available,
+			Id:       book.ID,
+			Title:    book.Title,
+			Author:   book.Author,
+			Category: book.Category,
 		},
 	}, nil
 }
@@ -172,13 +170,31 @@ func (s *BookGRPCServer) SearchBooks(ctx context.Context, req *pb.SearchBooksReq
 	var response pb.SearchBooksResponse
 	for _, book := range books {
 		response.Books = append(response.Books, &pb.Book{
-			Id:        book.ID,
-			Title:     book.Title,
-			Author:    book.Author,
-			Category:  book.Category,
-			Available: book.Available,
+			Id:       book.ID,
+			Title:    book.Title,
+			Author:   book.Author,
+			Category: book.Category,
+			Status:   book.Status,
 		})
 	}
 
 	return &response, nil
 }
+
+// func (s *BookGRPCServer) CheckAvailability(ctx context.Context, req *pb.CheckAvailabilityRequest) (*pb.CheckAvailabilityResponse, error) {
+// 	book, err := s.service.GetBookByID(req.BookId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &pb.CheckAvailabilityResponse{Status: book.Available}, nil
+// }
+
+// func (s *BookGRPCServer) UpdateBookStatus(ctx context.Context, req *pb.UpdateBookStatusRequest) (*pb.UpdateBookStatusResponse, error) {
+// 	err := s.service.UpdateBookStatus(req.BookId, req.Status)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &pb.UpdateBookStatusResponse{Success: true}, nil
+// }

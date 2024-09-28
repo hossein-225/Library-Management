@@ -6,6 +6,7 @@ import (
 
 	"github.com/hossein-225/Library-Management/book-service/internal/application"
 	"github.com/hossein-225/Library-Management/book-service/internal/domain"
+	pb "github.com/hossein-225/Library-Management/book-service/proto"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,11 +31,11 @@ func TestListBooks(t *testing.T) {
 	repo := &MockBookRepository{
 		Books: []*domain.Book{
 			{
-				ID:        "123",
-				Title:     "Test Book",
-				Author:    "John Doe",
-				Category:  "Fiction",
-				Available: true,
+				ID:       "123",
+				Title:    "Test Book",
+				Author:   "John Doe",
+				Category: "Fiction",
+				Status:   pb.BookStatus_AVAILABLE,
 			},
 		},
 	}

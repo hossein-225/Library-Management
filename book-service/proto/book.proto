@@ -10,6 +10,15 @@ service BookService {
   rpc UpdateBook (UpdateBookRequest) returns (UpdateBookResponse);
   rpc DeleteBook (DeleteBookRequest) returns (DeleteBookResponse);
   rpc SearchBooks (SearchBooksRequest) returns (SearchBooksResponse);
+  rpc CheckAvailability(CheckAvailabilityRequest) returns (CheckAvailabilityResponse);
+  rpc UpdateBookStatus(UpdateBookStatusRequest) returns (UpdateBookStatusResponse);
+}
+
+enum BookStatus {
+  BOOK_STATUS_UNSPECIFIED = 0;
+  AVAILABLE = 1;
+  BORROWED = 2;
+  RESERVED = 3;
 }
 
 message Book {
@@ -17,7 +26,7 @@ message Book {
   string title = 2;
   string author = 3;
   string category = 4;
-  bool available = 5;
+  BookStatus status = 5;
 }
 
 message ListBooksRequest {}
@@ -41,7 +50,7 @@ message UpdateBookRequest {
   string title = 2;
   string author = 3;
   string category = 4;
-  bool available = 5;
+  BookStatus status = 5;
 }
 
 message UpdateBookResponse {
@@ -64,4 +73,21 @@ message SearchBooksRequest {
 
 message SearchBooksResponse {
   repeated Book books = 1;
+}
+
+message CheckAvailabilityRequest {
+  string book_id = 1;
+}
+
+message CheckAvailabilityResponse {
+  BookStatus status = 1;
+}
+
+message UpdateBookStatusRequest {
+  string book_id = 1;
+  BookStatus status = 2;
+}
+
+message UpdateBookStatusResponse {
+  bool success = 1;
 }
