@@ -19,6 +19,7 @@ import (
 // @BasePath /
 func main() {
 	router := gin.Default()
+	router.SetTrustedProxies(nil)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

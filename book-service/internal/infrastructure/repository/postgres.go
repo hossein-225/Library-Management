@@ -38,7 +38,7 @@ func (r *PostgresBookRepository) AddBook(book *domain.Book) error {
 }
 
 func (r *PostgresBookRepository) UpdateBook(book *domain.Book) error {
-	_, err := r.db.Exec("UPDATE books SET title=$1, author=$2, category=$3, available=$4 WHERE id=$5", book.Title, book.Author, book.Category, book.Available, book.ID)
+	_, err := r.db.Exec("UPDATE books SET title=$1, author=$2, category=$3 WHERE id=$4", book.Title, book.Author, book.Category, book.ID)
 	return err
 }
 

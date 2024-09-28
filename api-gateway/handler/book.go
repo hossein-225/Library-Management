@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	bookpb "github.com/hossein-225/Library-Management/book-service/proto"
@@ -24,8 +26,11 @@ func HandleBookList(c *gin.Context) {
 		return
 	}
 
+	token = strings.TrimPrefix(token, "Bearer ")
+
 	_, _, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
@@ -74,9 +79,12 @@ func HandleAddBook(c *gin.Context) {
 		return
 	}
 
-	_, isAdmin, err := AuthenticateUser(c.Request.Context(), token)
-	if err != nil || !isAdmin {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: Admins only"})
+	token = strings.TrimPrefix(token, "Bearer ")
+
+	_, _, err := AuthenticateUser(c.Request.Context(), token)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
@@ -130,6 +138,8 @@ func HandleUpdateBook(c *gin.Context) {
 		return
 	}
 
+	token = strings.TrimPrefix(token, "Bearer ")
+
 	_, isAdmin, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil || !isAdmin {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: Admins only"})
@@ -180,6 +190,8 @@ func HandleDeleteBook(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
+
+	token = strings.TrimPrefix(token, "Bearer ")
 
 	_, isAdmin, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil || !isAdmin {

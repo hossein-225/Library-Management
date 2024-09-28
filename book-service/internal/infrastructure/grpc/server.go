@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"log"
 
 	"github.com/hossein-225/Library-Management/book-service/pkg/utils"
 	pb "github.com/hossein-225/Library-Management/book-service/proto"
@@ -153,6 +154,7 @@ func (s *BookGRPCServer) DeleteBook(ctx context.Context, req *pb.DeleteBookReque
 	}
 
 	if err := s.service.DeleteBook(ctx, req.Id); err != nil {
+		log.Println(err)
 		return nil, status.Errorf(codes.Internal, "Failed to delete book: %v", err)
 	}
 

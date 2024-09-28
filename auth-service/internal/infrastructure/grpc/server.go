@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"errors"
+	"log"
 
 	"github.com/hossein-225/Library-Management/auth-service/internal/application"
 	pb "github.com/hossein-225/Library-Management/auth-service/proto"
@@ -71,10 +73,27 @@ func (s *AuthGRPCServer) ValidateToken(ctx context.Context, req *pb.ValidateToke
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid token: missing userID")
 	}
 
-	role, ok := claims["role"].(pb.Role)
+	role, ok := claims["role"].(string)
 	if !ok {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid token: missing role")
 	}
 
-	return &pb.ValidateTokenResponse{UserId: userID, Role: role}, nil
+	pbRole, err := stringToRole(role)
+	if err != nil {
+		log.Println(err)
+		return nil, status.Errorf(codes.Unauthenticated, err.Error())
+	}
+
+	return &pb.ValidateTokenResponse{UserId: userID, Role: pbRole}, nil
+}
+
+func stringToRole(role string) (pb.Role, error) {
+	switch role {
+	case "user":
+		return pb.Role_USER, nil
+	case "admin":
+		return pb.Role_ADMIN, nil
+	default:
+		return pb.Role(0), errors.New("invalid role")
+	}
 }
