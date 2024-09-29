@@ -53,23 +53,31 @@ type MockBookRepository struct {
 	AddedBook *domain.Book
 }
 
-func (m *MockBookRepository) SearchBooks(title string, author string, category string) ([]*domain.Book, error) {
+func (m *MockBookRepository) CheckAvailability(ctx context.Context, bookID string) (pb.BookStatus, error) {
 	panic("unimplemented")
 }
 
-func (m *MockBookRepository) ListBooks() ([]*domain.Book, error) {
+func (m *MockBookRepository) UpdateBookStatus(ctx context.Context, bookID string, status pb.BookStatus) error {
+	panic("unimplemented")
+}
+
+func (m *MockBookRepository) SearchBooks(ctx context.Context, title string, author string, category string) ([]*domain.Book, error) {
+	panic("unimplemented")
+}
+
+func (m *MockBookRepository) ListBooks(ctx context.Context) ([]*domain.Book, error) {
 	return m.Books, nil
 }
 
-func (m *MockBookRepository) AddBook(book *domain.Book) error {
+func (m *MockBookRepository) AddBook(ctx context.Context, book *domain.Book) error {
 	m.AddedBook = book
 	return nil
 }
 
-func (m *MockBookRepository) UpdateBook(book *domain.Book) error {
+func (m *MockBookRepository) UpdateBook(ctx context.Context, book *domain.Book) error {
 	return nil
 }
 
-func (m *MockBookRepository) DeleteBook(id string) error {
+func (m *MockBookRepository) DeleteBook(ctx context.Context, id string) error {
 	return nil
 }

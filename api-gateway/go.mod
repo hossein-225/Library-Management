@@ -4,10 +4,10 @@ go 1.23.0
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/hossein-225/Library-Management/auth-service v0.0.0-20240927075537-2b1ce04fe349
-	github.com/hossein-225/Library-Management/book-service v0.0.0-20240927075537-2b1ce04fe349
-	github.com/hossein-225/Library-Management/borrow-service v0.0.0-20240927075537-2b1ce04fe349
-	github.com/hossein-225/Library-Management/user-service v0.0.0-20240927075537-2b1ce04fe349
+	github.com/hossein-225/Library-Management/auth-service v0.0.0-20240928194018-04d611b90352
+	github.com/hossein-225/Library-Management/book-service v0.0.0-20240928194018-04d611b90352
+	github.com/hossein-225/Library-Management/borrow-service v0.0.0-20240928194018-04d611b90352
+	github.com/hossein-225/Library-Management/user-service v0.0.0-20240928194018-04d611b90352
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
@@ -50,7 +50,7 @@ require (
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/tools v0.25.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240814211410-ddb44dafa142 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240924160255-9d4c2d233b61 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

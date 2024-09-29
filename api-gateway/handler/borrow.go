@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	borrowpb "github.com/hossein-225/Library-Management/borrow-service/proto"
@@ -24,6 +25,8 @@ func HandleBorrowBook(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
+
+	token = strings.TrimPrefix(token, "Bearer ")
 
 	userID, _, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil {
@@ -74,6 +77,8 @@ func HandleReturnBook(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 		return
 	}
+
+	token = strings.TrimPrefix(token, "Bearer ")
 
 	userID, _, err := AuthenticateUser(c.Request.Context(), token)
 	if err != nil {

@@ -71,59 +71,6 @@
                 }
             }
         },
-        "/borrows/user": {
-            "get": {
-                "description": "Retrieves the list of books borrowed by a specific user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "borrow"
-                ],
-                "summary": "Get user's borrowed books",
-                "parameters": [
-                    {
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of borrowed books retrieved successfully",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "User ID cannot be empty",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "No borrow records found for this user",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/return": {
             "post": {
                 "description": "Allows a user to return a borrowed book to the library",

@@ -33,26 +33,6 @@ func TestReturnBook(t *testing.T) {
 	assert.Equal(t, "book456", repo.ReturnedBookID)
 }
 
-func TestGetUserBorrows(t *testing.T) {
-	repo := &MockBorrowRepository{
-		Borrows: []*domain.Borrow{
-			{
-				ID:       "1",
-				UserID:   "user123",
-				BookID:   "book456",
-				Borrowed: true,
-			},
-		},
-	}
-	service := application.NewBorrowService(repo)
-
-	borrows, err := service.GetUserBorrows(context.Background(), "user123")
-
-	assert.NoError(t, err)
-	assert.Len(t, borrows, 1)
-	assert.Equal(t, "book456", borrows[0].BookID)
-}
-
 type MockBorrowRepository struct {
 	Borrows        []*domain.Borrow
 	BorrowedBook   *domain.Borrow

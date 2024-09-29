@@ -28,7 +28,3 @@ func (s *BorrowService) BorrowBook(ctx context.Context, userID, bookID string) e
 func (s *BorrowService) ReturnBook(ctx context.Context, userID, bookID string) error {
 	return s.repo.ReturnBook(userID, bookID)
 }
-
-func (s *BorrowService) GetUserBorrows(ctx context.Context, userID string) ([]*domain.Borrow, error) {
-	return s.repo.GetUserBorrows(userID)
-}

@@ -3,8 +3,10 @@ package grpc
 import (
 	"context"
 
+	bookpb "github.com/hossein-225/Library-Management/book-service/proto"
 	"github.com/hossein-225/Library-Management/borrow-service/internal/application"
 	pb "github.com/hossein-225/Library-Management/borrow-service/proto"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -36,9 +38,36 @@ func (s *BorrowGRPCServer) BorrowBook(ctx context.Context, req *pb.BorrowBookReq
 		return nil, status.Errorf(codes.InvalidArgument, "User ID or Book ID cannot be empty")
 	}
 
-	err := s.service.BorrowBook(ctx, req.UserId, req.BookId)
+	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to connect to book service: %v", err)
+	}
+	defer conn.Close()
+
+	bookClient := bookpb.NewBookServiceClient(conn)
+
+	checkReq := &bookpb.CheckAvailabilityRequest{BookId: req.BookId}
+	checkRes, err := bookClient.CheckAvailability(ctx, checkReq)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to check book availability: %v", err)
+	}
+
+	if checkRes.Status != bookpb.BookStatus_AVAILABLE {
+		return nil, status.Errorf(codes.FailedPrecondition, "Book is not available for borrowing")
+	}
+
+	err = s.service.BorrowBook(ctx, req.UserId, req.BookId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to borrow book: %v", err)
+	}
+
+	updateStatusReq := &bookpb.UpdateBookStatusRequest{
+		BookId: req.BookId,
+		Status: bookpb.BookStatus_BORROWED,
+	}
+	_, err = bookClient.UpdateBookStatus(ctx, updateStatusReq)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to update book status: %v", err)
 	}
 
 	return &pb.BorrowBookResponse{
@@ -69,42 +98,24 @@ func (s *BorrowGRPCServer) ReturnBook(ctx context.Context, req *pb.ReturnBookReq
 		return nil, status.Errorf(codes.Internal, "Failed to return book: %v", err)
 	}
 
+	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to connect to book service: %v", err)
+	}
+	defer conn.Close()
+
+	bookClient := bookpb.NewBookServiceClient(conn)
+
+	updateStatusReq := &bookpb.UpdateBookStatusRequest{
+		BookId: req.BookId,
+		Status: bookpb.BookStatus_AVAILABLE,
+	}
+	_, err = bookClient.UpdateBookStatus(ctx, updateStatusReq)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to update book status: %v", err)
+	}
+
 	return &pb.ReturnBookResponse{
 		Message: "Book returned successfully",
 	}, nil
-}
-
-// GetUserBorrows
-// @Summary Get user's borrowed books
-// @Description Retrieves the list of books borrowed by a specific user
-// @Tags borrow
-// @Accept  json
-// @Produce  json
-// @Param   user_id  body   string   true  "User ID"
-// @Success 200 {object} map[string]interface{} "List of borrowed books retrieved successfully"
-// @Failure 400 {string} string "User ID cannot be empty"
-// @Failure 404 {string} string "No borrow records found for this user"
-// @Failure 500 {string} string "Internal server error"
-// @Router /borrows/user [get]
-func (s *BorrowGRPCServer) GetUserBorrows(ctx context.Context, req *pb.GetUserBorrowsRequest) (*pb.GetUserBorrowsResponse, error) {
-	if req.UserId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "User ID cannot be empty")
-	}
-
-	borrows, err := s.service.GetUserBorrows(ctx, req.UserId)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to retrieve borrow records: %v", err)
-	}
-
-	var response pb.GetUserBorrowsResponse
-	for _, borrow := range borrows {
-		response.Borrows = append(response.Borrows, &pb.Borrow{
-			Id:       borrow.ID,
-			UserId:   borrow.UserID,
-			BookId:   borrow.BookID,
-			Borrowed: borrow.Borrowed,
-		})
-	}
-
-	return &response, nil
 }

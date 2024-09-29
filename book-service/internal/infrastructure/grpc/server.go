@@ -78,6 +78,7 @@ func (s *BookGRPCServer) AddBook(ctx context.Context, req *pb.AddBookRequest) (*
 	}
 
 	if err := s.service.AddBook(ctx, book); err != nil {
+		log.Println(err)
 		return nil, status.Errorf(codes.Internal, "Failed to add book: %v", err)
 	}
 
@@ -181,20 +182,20 @@ func (s *BookGRPCServer) SearchBooks(ctx context.Context, req *pb.SearchBooksReq
 	return &response, nil
 }
 
-// func (s *BookGRPCServer) CheckAvailability(ctx context.Context, req *pb.CheckAvailabilityRequest) (*pb.CheckAvailabilityResponse, error) {
-// 	book, err := s.service.GetBookByID(req.BookId)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (s *BookGRPCServer) CheckAvailability(ctx context.Context, req *pb.CheckAvailabilityRequest) (*pb.CheckAvailabilityResponse, error) {
+	status, err := s.service.CheckAvailability(ctx, req.BookId)
+	if err != nil {
+		return nil, err
+	}
 
-// 	return &pb.CheckAvailabilityResponse{Status: book.Available}, nil
-// }
+	return &pb.CheckAvailabilityResponse{Status: status}, nil
+}
 
-// func (s *BookGRPCServer) UpdateBookStatus(ctx context.Context, req *pb.UpdateBookStatusRequest) (*pb.UpdateBookStatusResponse, error) {
-// 	err := s.service.UpdateBookStatus(req.BookId, req.Status)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (s *BookGRPCServer) UpdateBookStatus(ctx context.Context, req *pb.UpdateBookStatusRequest) (*pb.UpdateBookStatusResponse, error) {
+	err := s.service.UpdateBookStatus(ctx, req.BookId, req.Status)
+	if err != nil {
+		return &pb.UpdateBookStatusResponse{Success: false}, err
+	}
 
-// 	return &pb.UpdateBookStatusResponse{Success: true}, nil
-// }
+	return &pb.UpdateBookStatusResponse{Success: true}, nil
+}

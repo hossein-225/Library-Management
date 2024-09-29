@@ -94,6 +94,7 @@ func HandleAddBook(c *gin.Context) {
 
 	err = addBook(c.Request.Context(), title, author, category)
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add book"})
 		return
 	}

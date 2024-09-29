@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
+	github.com/hossein-225/Library-Management/book-service v0.0.0-20240928194018-04d611b90352
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v1.0.1

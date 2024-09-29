@@ -47,41 +47,6 @@ paths:
       summary: Borrow a book
       tags:
       - borrow
-  /borrows/user:
-    get:
-      consumes:
-      - application/json
-      description: Retrieves the list of books borrowed by a specific user
-      parameters:
-      - description: User ID
-        in: body
-        name: user_id
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: List of borrowed books retrieved successfully
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: User ID cannot be empty
-          schema:
-            type: string
-        "404":
-          description: No borrow records found for this user
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      summary: Get user's borrowed books
-      tags:
-      - borrow
   /return:
     post:
       consumes:
