@@ -14,7 +14,6 @@ func TestRegisterUser(t *testing.T) {
 	service := application.NewUserService(repo)
 
 	user := &domain.User{
-		ID:       "123",
 		Name:     "Test User",
 		Email:    "test@example.com",
 		Password: "password",
@@ -31,7 +30,6 @@ func TestAuthenticateUser(t *testing.T) {
 	repo := &MockUserRepository{
 		Users: []*domain.User{
 			{
-				ID:       "123",
 				Name:     "Test User",
 				Email:    "test@example.com",
 				Password: "password",
@@ -66,7 +64,7 @@ func (m *MockUserRepository) AuthenticateUser(email, password string) (*domain.U
 	return nil, nil
 }
 
-func (m *MockUserRepository) GetUserProfile(id string) (*domain.User, error) {
+func (m *MockUserRepository) GetUserProfile(email string) (*domain.User, error) {
 	return nil, nil
 }
 

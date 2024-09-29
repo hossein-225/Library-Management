@@ -39,7 +39,6 @@ func (s *UserGRPCServer) RegisterUser(ctx context.Context, req *pb.RegisterUserR
 	}
 
 	user := &domain.User{
-		ID:       utils.GenerateUUID(),
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
@@ -52,7 +51,6 @@ func (s *UserGRPCServer) RegisterUser(ctx context.Context, req *pb.RegisterUserR
 
 	return &pb.RegisterUserResponse{
 		User: &pb.User{
-			Id:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
 			Role:  user.Role,
@@ -82,7 +80,7 @@ func (s *UserGRPCServer) AuthenticateUser(ctx context.Context, req *pb.Authentic
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
 	}
 
-	token, err := utils.GenerateJWT(user.ID, user.Role)
+	token, err := utils.GenerateJWT(user.Email, user.Role)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to generate token")
 	}
@@ -98,25 +96,24 @@ func (s *UserGRPCServer) AuthenticateUser(ctx context.Context, req *pb.Authentic
 // @Tags users
 // @Accept  json
 // @Produce  json
-// @Param   user_id  query  string   true  "User ID"
+// @Param   email  query  string   true  "Email"
 // @Success 200 {object} map[string]interface{} "Profile retrieved successfully"
-// @Failure 400 {string} string "User ID cannot be empty"
+// @Failure 400 {string} string "Email cannot be empty"
 // @Failure 404 {string} string "User not found"
 // @Failure 500 {string} string "Internal server error"
 // @Router /users/profile [get]
 func (s *UserGRPCServer) GetUserProfile(ctx context.Context, req *pb.GetUserProfileRequest) (*pb.GetUserProfileResponse, error) {
-	if req.UserId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "User ID cannot be empty")
+	if req.Email == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Email cannot be empty")
 	}
 
-	user, err := s.service.GetUserProfile(ctx, req.UserId)
+	user, err := s.service.GetUserProfile(ctx, req.Email)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to retrieve user profile: %v", err)
 	}
 
 	return &pb.GetUserProfileResponse{
 		User: &pb.User{
-			Id:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
 		},
@@ -129,21 +126,20 @@ func (s *UserGRPCServer) GetUserProfile(ctx context.Context, req *pb.GetUserProf
 // @Tags users
 // @Accept  json
 // @Produce  json
-// @Param   user_id  body   string   true  "User ID"
+// @Param   email  body   string   true  "Email"
 // @Param   name     body   string   true  "New name"
 // @Param   email    body   string   true  "New email"
 // @Success 200 {object} map[string]interface{} "Profile updated successfully"
-// @Failure 400 {string} string "User ID, name, or email cannot be empty"
+// @Failure 400 {string} string "Email, name, or email cannot be empty"
 // @Failure 404 {string} string "User not found"
 // @Failure 500 {string} string "Internal server error"
 // @Router /users/profile [put]
 func (s *UserGRPCServer) UpdateUserProfile(ctx context.Context, req *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponse, error) {
-	if req.UserId == "" || req.Name == "" || req.Email == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "User ID, name, or email cannot be empty")
+	if req.Name == "" || req.Email == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Email, name, or email cannot be empty")
 	}
 
 	user := &domain.User{
-		ID:    req.UserId,
 		Name:  req.Name,
 		Email: req.Email,
 	}
@@ -154,7 +150,6 @@ func (s *UserGRPCServer) UpdateUserProfile(ctx context.Context, req *pb.UpdateUs
 
 	return &pb.UpdateUserProfileResponse{
 		User: &pb.User{
-			Id:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
 		},

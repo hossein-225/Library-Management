@@ -10,7 +10,6 @@ import (
 	"github.com/hossein-225/Library-Management/user-service/internal/domain"
 	user_grpc "github.com/hossein-225/Library-Management/user-service/internal/infrastructure/grpc"
 	"github.com/hossein-225/Library-Management/user-service/internal/infrastructure/repository"
-	"github.com/hossein-225/Library-Management/user-service/pkg/utils"
 	pb "github.com/hossein-225/Library-Management/user-service/proto"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -106,9 +105,7 @@ func createAdminIfNotExists(db *sql.DB) {
 			log.Fatalf("Failed to hash admin password: %v", err)
 		}
 
-		id := utils.GenerateUUID()
-
-		_, err = db.Exec("INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)", id, "admin", "admin@example.com", string(hashedPassword), "admin")
+		_, err = db.Exec("INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)", "admin", "admin@example.com", string(hashedPassword), "admin")
 		if err != nil {
 			log.Fatalf("Failed to create admin user: %v", err)
 		}

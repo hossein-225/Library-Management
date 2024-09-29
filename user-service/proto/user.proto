@@ -12,10 +12,9 @@ service UserService {
 }
 
 message User {
-  string id = 1;
-  string name = 2;
-  string email = 3;
-  string role = 4;
+  string name = 1;
+  string email = 2;
+  string role = 3;
 }
 
 message RegisterUserRequest {
@@ -38,7 +37,7 @@ message AuthenticateUserResponse {
 }
 
 message GetUserProfileRequest {
-  string user_id = 1;
+  string email = 1;
 }
 
 message GetUserProfileResponse {
@@ -46,9 +45,8 @@ message GetUserProfileResponse {
 }
 
 message UpdateUserProfileRequest {
-  string user_id = 1;
-  string name = 2;
-  string email = 3;
+  string name = 1;
+  string email = 2;
 }
 
 message UpdateUserProfileResponse {
