@@ -118,7 +118,7 @@ func createAdminIfNotExists(db *sql.DB) {
 
 func configModels(client *gorm.DB) error {
 
-	err := client.AutoMigrate(&domain.User{})
+	err := client.Migrator().AutoMigrate(&domain.User{})
 	if err != nil {
 		log.Println(err)
 		return err

@@ -47,8 +47,8 @@ github.com/hossein-225/Library-Management/book-service v0.0.0-20240928194018-04d
 github.com/hossein-225/Library-Management/book-service v0.0.0-20240928194018-04d611b90352/go.mod h1:gA4Ruk4dgSEcOcmZSgkOh9hXPk2fwPjCC3oW8vs1ork=
 github.com/hossein-225/Library-Management/borrow-service v0.0.0-20240928194018-04d611b90352 h1:BjSUuWRLHtr5b3yPQMhhTotaeRetX7qlZ8gB9e/sB/w=
 github.com/hossein-225/Library-Management/borrow-service v0.0.0-20240928194018-04d611b90352/go.mod h1:4ngYq39cbZGaT+1XMu9h5oetk5c7neMACDIW2kBO5mw=
-github.com/hossein-225/Library-Management/user-service v0.0.0-20240928194018-04d611b90352 h1:CkOOpGklQmf3AmnMvFraRq4itfZ0ciTQsSlyEW1vqkA=
-github.com/hossein-225/Library-Management/user-service v0.0.0-20240928194018-04d611b90352/go.mod h1:0gzNihEZVOs+6ucEQS4vYtoxp41SnM3yVnGOuxNtY/A=
+github.com/hossein-225/Library-Management/user-service v0.0.0-20240929162248-b4dcda368067 h1:ElCIrFZMPRloPZfx3kyzUYLQQOqZeW+Clflo9kiGQ3w=
+github.com/hossein-225/Library-Management/user-service v0.0.0-20240929162248-b4dcda368067/go.mod h1:0gzNihEZVOs+6ucEQS4vYtoxp41SnM3yVnGOuxNtY/A=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=

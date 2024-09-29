@@ -116,6 +116,7 @@ func (s *UserGRPCServer) GetUserProfile(ctx context.Context, req *pb.GetUserProf
 		User: &pb.User{
 			Name:  user.Name,
 			Email: user.Email,
+			Role:  user.Role,
 		},
 	}, nil
 }
@@ -136,7 +137,7 @@ func (s *UserGRPCServer) GetUserProfile(ctx context.Context, req *pb.GetUserProf
 // @Router /users/profile [put]
 func (s *UserGRPCServer) UpdateUserProfile(ctx context.Context, req *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponse, error) {
 	if req.Name == "" || req.Email == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "Email, name, or email cannot be empty")
+		return nil, status.Errorf(codes.InvalidArgument, "name, or email cannot be empty")
 	}
 
 	user := &domain.User{

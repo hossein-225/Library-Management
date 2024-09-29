@@ -21,7 +21,7 @@ func (r *PostgresUserRepository) RegisterUser(user *domain.User) error {
 		return err
 	}
 
-	_, err = r.db.Exec("INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4, $5)", user.Name, user.Email, string(hashedPassword), user.Role)
+	_, err = r.db.Exec("INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)", user.Name, user.Email, string(hashedPassword), user.Role)
 	return err
 }
 
@@ -55,6 +55,7 @@ func (r *PostgresUserRepository) GetUserProfile(email string) (*domain.User, err
 	if err != nil {
 		return nil, err
 	}
+
 	return user, nil
 }
 

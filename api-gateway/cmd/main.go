@@ -49,6 +49,9 @@ func main() {
 		{
 			users.POST("/register", handler.HandleUserRegister)
 			users.POST("/login", handler.HandleUserLogin)
+
+			users.GET("/profile", handler.HandleGetUserProfile)
+			users.PUT("/profile", handler.HandleUpdateUserProfile)
 		}
 
 	}
