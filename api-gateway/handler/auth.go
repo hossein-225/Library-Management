@@ -4,17 +4,9 @@ import (
 	"context"
 
 	authpb "github.com/hossein-225/Library-Management/auth-service/proto"
-	"google.golang.org/grpc"
 )
 
-func AuthenticateUser(ctx context.Context, token string) (string, bool, error) {
-	conn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
-	if err != nil {
-		return "", false, err
-	}
-	defer conn.Close()
-
-	client := authpb.NewAuthServiceClient(conn)
+func authenticateUser(ctx context.Context, client authpb.AuthServiceClient, token string) (string, bool, error) {
 	req := &authpb.ValidateTokenRequest{Token: token}
 	res, err := client.ValidateToken(ctx, req)
 	if err != nil {

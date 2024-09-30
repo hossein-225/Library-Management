@@ -4,10 +4,11 @@ go 1.23.0
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/hossein-225/Library-Management/auth-service v0.0.0-20240928194018-04d611b90352
-	github.com/hossein-225/Library-Management/book-service v0.0.0-20240928194018-04d611b90352
-	github.com/hossein-225/Library-Management/borrow-service v0.0.0-20240928194018-04d611b90352
-	github.com/hossein-225/Library-Management/user-service v0.0.0-20240929162248-b4dcda368067
+	github.com/golang/mock v1.6.0
+	github.com/hossein-225/Library-Management/auth-service v0.0.0-20240930081018-f61129ecf428
+	github.com/hossein-225/Library-Management/book-service v0.0.0-20240930081018-f61129ecf428
+	github.com/hossein-225/Library-Management/borrow-service v0.0.0-20240930081018-f61129ecf428
+	github.com/hossein-225/Library-Management/user-service v0.0.0-20240930081018-f61129ecf428
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

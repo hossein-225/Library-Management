@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	authpb "github.com/hossein-225/Library-Management/auth-service/proto"
 	userpb "github.com/hossein-225/Library-Management/user-service/proto"
 	"google.golang.org/grpc"
 )
@@ -27,7 +28,17 @@ func HandleUserRegister(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
-	err := registerUser(c.Request.Context(), name, email, password)
+	conn, err := grpc.NewClient("user-service:50052", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := userpb.NewUserServiceClient(conn)
+
+	err = registerUser(c.Request.Context(), client, name, email, password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 		return
@@ -36,21 +47,14 @@ func HandleUserRegister(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
 }
 
-func registerUser(ctx context.Context, name, email, password string) error {
-	conn, err := grpc.NewClient("user-service:50052", grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := userpb.NewUserServiceClient(conn)
+func registerUser(ctx context.Context, client userpb.UserServiceClient, name, email, password string) error {
 	req := &userpb.RegisterUserRequest{
 		Name:     name,
 		Email:    email,
 		Password: password,
 	}
 
-	_, err = client.RegisterUser(ctx, req)
+	_, err := client.RegisterUser(ctx, req)
 	return err
 }
 
@@ -68,7 +72,17 @@ func HandleUserLogin(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
-	token, err := loginUser(c.Request.Context(), email, password)
+	conn, err := grpc.NewClient("user-service:50052", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := userpb.NewUserServiceClient(conn)
+
+	token, err := loginUser(c.Request.Context(), client, email, password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Login failed"})
 		return
@@ -77,14 +91,7 @@ func HandleUserLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-func loginUser(ctx context.Context, email, password string) (string, error) {
-	conn, err := grpc.NewClient("user-service:50052", grpc.WithInsecure())
-	if err != nil {
-		return "", err
-	}
-	defer conn.Close()
-
-	client := userpb.NewUserServiceClient(conn)
+func loginUser(ctx context.Context, client userpb.UserServiceClient, email, password string) (string, error) {
 	req := &userpb.AuthenticateUserRequest{
 		Email:    email,
 		Password: password,
@@ -120,14 +127,34 @@ func HandleGetUserProfile(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	email, _, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	email, _, err := authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	profile, err := getUserProfile(c.Request.Context(), email)
+	conn, err := grpc.NewClient("user-service:50052", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := userpb.NewUserServiceClient(conn)
+
+	profile, err := getUserProfile(c.Request.Context(), client, email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user profile"})
 		return
@@ -140,15 +167,7 @@ func HandleGetUserProfile(c *gin.Context) {
 	})
 }
 
-func getUserProfile(ctx context.Context, email string) (*userpb.User, error) {
-	conn, err := grpc.NewClient("user-service:50052", grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	client := userpb.NewUserServiceClient(conn)
-
+func getUserProfile(ctx context.Context, client userpb.UserServiceClient, email string) (*userpb.User, error) {
 	req := &userpb.GetUserProfileRequest{
 		Email: email,
 	}
@@ -184,7 +203,17 @@ func HandleUpdateUserProfile(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	email, _, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	email, _, err := authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -198,7 +227,17 @@ func HandleUpdateUserProfile(c *gin.Context) {
 		return
 	}
 
-	err = updateUserProfile(c.Request.Context(), name, email)
+	conn, err := grpc.NewClient("user-service:50052", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := userpb.NewUserServiceClient(conn)
+
+	err = updateUserProfile(c.Request.Context(), client, name, email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user profile"})
 		return
@@ -207,20 +246,12 @@ func HandleUpdateUserProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Profile updated successfully"})
 }
 
-func updateUserProfile(ctx context.Context, name, email string) error {
-	conn, err := grpc.NewClient("user-service:50052", grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := userpb.NewUserServiceClient(conn)
-
+func updateUserProfile(ctx context.Context, client userpb.UserServiceClient, name, email string) error {
 	req := &userpb.UpdateUserProfileRequest{
 		Name:  name,
 		Email: email,
 	}
 
-	_, err = client.UpdateUserProfile(ctx, req)
+	_, err := client.UpdateUserProfile(ctx, req)
 	return err
 }

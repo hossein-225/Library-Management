@@ -7,25 +7,38 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	bookpb "github.com/hossein-225/Library-Management/book-service/proto"
+	mock_proto "github.com/hossein-225/Library-Management/book-service/proto/mock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandleBookList(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockBookClient := mock_proto.NewMockBookServiceClient(ctrl)
+
+	mockBookClient.EXPECT().ListBooks(gomock.Any(), gomock.Any()).Return(&bookpb.ListBooksResponse{
+		Books: []*bookpb.Book{
+			{
+				Id:       "1",
+				Title:    "Test Book",
+				Author:   "John Doe",
+				Category: "Science",
+			},
+		},
+	}, nil)
+
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 
-	router.Use(func(c *gin.Context) {
-		token := c.GetHeader("Authorization")
-		if token == "valid_token" {
-			c.Set("userID", "user123")
-			c.Next()
-		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		}
-	})
-
 	router.GET("/books", func(c *gin.Context) {
-		books := []string{"Book List"}
+		books, err := fetchBooks(c.Request.Context(), mockBookClient)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch books"})
+			return
+		}
 		c.JSON(http.StatusOK, books)
 	})
 
@@ -36,36 +49,30 @@ func TestHandleBookList(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Contains(t, w.Body.String(), "Book List")
+	assert.Contains(t, w.Body.String(), "Test Book")
 }
 
 func TestHandleAddBook(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockBookClient := mock_proto.NewMockBookServiceClient(ctrl)
+
+	mockBookClient.EXPECT().AddBook(gomock.Any(), gomock.Any()).Return(&bookpb.AddBookResponse{}, nil)
+
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 
-	router.Use(func(c *gin.Context) {
-		token := c.GetHeader("Authorization")
-		if token == "valid_admin_token" {
-			c.Set("userID", "admin123")
-			c.Set("isAdmin", true)
-			c.Next()
-		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		}
-	})
-
 	router.POST("/books", func(c *gin.Context) {
-		var book struct {
-			Title    string `json:"title"`
-			Author   string `json:"author"`
-			Category string `json:"category"`
-		}
+		title := c.PostForm("title")
+		author := c.PostForm("author")
+		category := c.PostForm("category")
 
-		if err := c.ShouldBindJSON(&book); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		err := addBook(c.Request.Context(), mockBookClient, title, author, category)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add book"})
 			return
 		}
-
 		c.JSON(http.StatusOK, gin.H{"message": "Book added successfully"})
 	})
 
@@ -82,32 +89,27 @@ func TestHandleAddBook(t *testing.T) {
 }
 
 func TestHandleUpdateBook(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockBookClient := mock_proto.NewMockBookServiceClient(ctrl)
+
+	mockBookClient.EXPECT().UpdateBook(gomock.Any(), gomock.Any()).Return(&bookpb.UpdateBookResponse{}, nil)
+
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 
-	router.Use(func(c *gin.Context) {
-		token := c.GetHeader("Authorization")
-		if token == "valid_admin_token" {
-			c.Set("userID", "admin123")
-			c.Set("isAdmin", true)
-			c.Next()
-		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		}
-	})
-
 	router.PUT("/books/:id", func(c *gin.Context) {
-		var book struct {
-			Title    string `json:"title"`
-			Author   string `json:"author"`
-			Category string `json:"category"`
-		}
+		bookID := c.Param("id")
+		title := c.PostForm("title")
+		author := c.PostForm("author")
+		category := c.PostForm("category")
 
-		if err := c.ShouldBindJSON(&book); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		err := updateBook(c.Request.Context(), mockBookClient, bookID, title, author, category)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update book"})
 			return
 		}
-
 		c.JSON(http.StatusOK, gin.H{"message": "Book updated successfully"})
 	})
 
@@ -124,27 +126,24 @@ func TestHandleUpdateBook(t *testing.T) {
 }
 
 func TestHandleDeleteBook(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockBookClient := mock_proto.NewMockBookServiceClient(ctrl)
+
+	mockBookClient.EXPECT().DeleteBook(gomock.Any(), gomock.Any()).Return(&bookpb.DeleteBookResponse{}, nil)
+
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 
-	router.Use(func(c *gin.Context) {
-		token := c.GetHeader("Authorization")
-		if token == "valid_admin_token" {
-			c.Set("userID", "admin123")
-			c.Set("isAdmin", true)
-			c.Next()
-		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		}
-	})
-
 	router.DELETE("/books/:id", func(c *gin.Context) {
 		bookID := c.Param("id")
-		if bookID == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid book ID"})
+
+		err := deleteBook(c.Request.Context(), mockBookClient, bookID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete book"})
 			return
 		}
-
 		c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
 	})
 
@@ -156,4 +155,47 @@ func TestHandleDeleteBook(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), "Book deleted successfully")
+}
+
+func TestHandleSearchBooks(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockBookClient := mock_proto.NewMockBookServiceClient(ctrl)
+
+	mockBookClient.EXPECT().SearchBooks(gomock.Any(), gomock.Any()).Return(&bookpb.SearchBooksResponse{
+		Books: []*bookpb.Book{
+			{
+				Id:       "1",
+				Title:    "Test Book",
+				Author:   "John Doe",
+				Category: "Science",
+			},
+		},
+	}, nil)
+
+	gin.SetMode(gin.TestMode)
+	router := gin.Default()
+
+	router.GET("/books/search", func(c *gin.Context) {
+		title := c.Query("title")
+		author := c.Query("author")
+		category := c.Query("category")
+
+		books, err := searchBooks(c.Request.Context(), mockBookClient, title, author, category)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search books"})
+			return
+		}
+		c.JSON(http.StatusOK, books)
+	})
+
+	req, _ := http.NewRequest("GET", "/books/search?title=Test Book", nil)
+	req.Header.Set("Authorization", "valid_token")
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), "Test Book")
 }

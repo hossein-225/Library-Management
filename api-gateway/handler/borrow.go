@@ -2,10 +2,12 @@ package handler
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	authpb "github.com/hossein-225/Library-Management/auth-service/proto"
 	borrowpb "github.com/hossein-225/Library-Management/borrow-service/proto"
 	"google.golang.org/grpc"
 )
@@ -28,7 +30,17 @@ func HandleBorrowBook(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	userID, _, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	userID, _, err := authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -36,7 +48,17 @@ func HandleBorrowBook(c *gin.Context) {
 
 	bookID := c.PostForm("book_id")
 
-	err = borrowBook(c.Request.Context(), userID, bookID)
+	conn, err := grpc.NewClient("borrow-service:50053", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := borrowpb.NewBorrowServiceClient(conn)
+
+	err = borrowBook(c.Request.Context(), client, userID, bookID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to borrow book"})
 		return
@@ -45,20 +67,13 @@ func HandleBorrowBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book borrowed successfully"})
 }
 
-func borrowBook(ctx context.Context, userID, bookID string) error {
-	conn, err := grpc.NewClient("borrow-service:50053", grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := borrowpb.NewBorrowServiceClient(conn)
+func borrowBook(ctx context.Context, client borrowpb.BorrowServiceClient, userID, bookID string) error {
 	req := &borrowpb.BorrowBookRequest{
 		UserId: userID,
 		BookId: bookID,
 	}
 
-	_, err = client.BorrowBook(ctx, req)
+	_, err := client.BorrowBook(ctx, req)
 	return err
 }
 
@@ -80,7 +95,17 @@ func HandleReturnBook(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	userID, _, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	userID, _, err := authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -88,7 +113,17 @@ func HandleReturnBook(c *gin.Context) {
 
 	bookID := c.PostForm("book_id")
 
-	err = returnBook(c.Request.Context(), userID, bookID)
+	conn, err := grpc.NewClient("borrow-service:50053", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := borrowpb.NewBorrowServiceClient(conn)
+
+	err = returnBook(c.Request.Context(), client, userID, bookID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to return book"})
 		return
@@ -97,19 +132,12 @@ func HandleReturnBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book returned successfully"})
 }
 
-func returnBook(ctx context.Context, userID, bookID string) error {
-	conn, err := grpc.NewClient("borrow-service:50053", grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := borrowpb.NewBorrowServiceClient(conn)
+func returnBook(ctx context.Context, client borrowpb.BorrowServiceClient, userID, bookID string) error {
 	req := &borrowpb.ReturnBookRequest{
 		UserId: userID,
 		BookId: bookID,
 	}
 
-	_, err = client.ReturnBook(ctx, req)
+	_, err := client.ReturnBook(ctx, req)
 	return err
 }

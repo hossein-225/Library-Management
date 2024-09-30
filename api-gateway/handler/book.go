@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	authpb "github.com/hossein-225/Library-Management/auth-service/proto"
 	bookpb "github.com/hossein-225/Library-Management/book-service/proto"
 	"google.golang.org/grpc"
 )
@@ -28,14 +29,34 @@ func HandleBookList(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	_, _, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	_, _, err = authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	books, err := fetchBooks(c.Request.Context())
+	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := bookpb.NewBookServiceClient(conn)
+
+	books, err := fetchBooks(c.Request.Context(), client)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch books"})
 		return
@@ -44,14 +65,7 @@ func HandleBookList(c *gin.Context) {
 	c.JSON(http.StatusOK, books)
 }
 
-func fetchBooks(ctx context.Context) ([]*bookpb.Book, error) {
-	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	client := bookpb.NewBookServiceClient(conn)
+func fetchBooks(ctx context.Context, client bookpb.BookServiceClient) ([]*bookpb.Book, error) {
 	req := &bookpb.ListBooksRequest{}
 	res, err := client.ListBooks(ctx, req)
 	if err != nil {
@@ -81,7 +95,17 @@ func HandleAddBook(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	_, _, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	_, _, err = authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -92,7 +116,17 @@ func HandleAddBook(c *gin.Context) {
 	author := c.PostForm("author")
 	category := c.PostForm("category")
 
-	err = addBook(c.Request.Context(), title, author, category)
+	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := bookpb.NewBookServiceClient(conn)
+
+	err = addBook(c.Request.Context(), client, title, author, category)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add book"})
@@ -102,21 +136,14 @@ func HandleAddBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book added successfully"})
 }
 
-func addBook(ctx context.Context, title, author, category string) error {
-	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := bookpb.NewBookServiceClient(conn)
+func addBook(ctx context.Context, client bookpb.BookServiceClient, title, author, category string) error {
 	req := &bookpb.AddBookRequest{
 		Title:    title,
 		Author:   author,
 		Category: category,
 	}
 
-	_, err = client.AddBook(ctx, req)
+	_, err := client.AddBook(ctx, req)
 	return err
 }
 
@@ -141,14 +168,39 @@ func HandleUpdateBook(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	_, isAdmin, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	_, isAdmin, err := authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil || !isAdmin {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: Admins only"})
 		return
 	}
 
 	bookID := c.Param("id")
-	err = updateBook(c.Request.Context(), bookID, c)
+
+	title := c.PostForm("title")
+	author := c.PostForm("author")
+	category := c.PostForm("category")
+
+	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := bookpb.NewBookServiceClient(conn)
+
+	err = updateBook(c.Request.Context(), client, bookID, title, author, category)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update book"})
 		return
@@ -157,22 +209,16 @@ func HandleUpdateBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book updated successfully"})
 }
 
-func updateBook(ctx context.Context, bookID string, c *gin.Context) error {
-	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
+func updateBook(ctx context.Context, client bookpb.BookServiceClient, bookID string, title, author, category string) error {
 
-	client := bookpb.NewBookServiceClient(conn)
 	req := &bookpb.UpdateBookRequest{
 		Id:       bookID,
-		Title:    c.PostForm("title"),
-		Author:   c.PostForm("author"),
-		Category: c.PostForm("category"),
+		Title:    title,
+		Author:   author,
+		Category: category,
 	}
 
-	_, err = client.UpdateBook(ctx, req)
+	_, err := client.UpdateBook(ctx, req)
 	return err
 }
 
@@ -194,14 +240,35 @@ func HandleDeleteBook(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	_, isAdmin, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	_, isAdmin, err := authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil || !isAdmin {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: Admins only"})
 		return
 	}
 
 	bookID := c.Param("id")
-	err = deleteBook(c.Request.Context(), bookID)
+
+	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := bookpb.NewBookServiceClient(conn)
+
+	err = deleteBook(c.Request.Context(), client, bookID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete book"})
 		return
@@ -210,17 +277,10 @@ func HandleDeleteBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
 }
 
-func deleteBook(ctx context.Context, bookID string) error {
-	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := bookpb.NewBookServiceClient(conn)
+func deleteBook(ctx context.Context, client bookpb.BookServiceClient, bookID string) error {
 	req := &bookpb.DeleteBookRequest{Id: bookID}
 
-	_, err = client.DeleteBook(ctx, req)
+	_, err := client.DeleteBook(ctx, req)
 	return err
 }
 
@@ -245,7 +305,17 @@ func HandleSearchBooks(c *gin.Context) {
 
 	token = strings.TrimPrefix(token, "Bearer ")
 
-	_, _, err := AuthenticateUser(c.Request.Context(), token)
+	authConn, err := grpc.NewClient("auth-service:50054", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
+	_, _, err = authenticateUser(c.Request.Context(), authClient, token)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -256,7 +326,17 @@ func HandleSearchBooks(c *gin.Context) {
 	author := c.Query("author")
 	category := c.Query("category")
 
-	books, err := searchBooks(c.Request.Context(), title, author, category)
+	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer conn.Close()
+
+	client := bookpb.NewBookServiceClient(conn)
+
+	books, err := searchBooks(c.Request.Context(), client, title, author, category)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search books"})
 		return
@@ -265,15 +345,7 @@ func HandleSearchBooks(c *gin.Context) {
 	c.JSON(http.StatusOK, books)
 }
 
-func searchBooks(ctx context.Context, title, author, category string) ([]*bookpb.Book, error) {
-	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	client := bookpb.NewBookServiceClient(conn)
-
+func searchBooks(ctx context.Context, client bookpb.BookServiceClient, title, author, category string) ([]*bookpb.Book, error) {
 	req := &bookpb.SearchBooksRequest{
 		Title:    title,
 		Author:   author,
