@@ -2,13 +2,13 @@ syntax = "proto3";
 
 package user;
 
-option go_package = "./user-service/proto";
+option go_package = "./proto";
 
 service UserService {
-  rpc RegisterUser (RegisterUserRequest) returns (RegisterUserResponse);
-  rpc AuthenticateUser (AuthenticateUserRequest) returns (AuthenticateUserResponse);
-  rpc GetUserProfile (GetUserProfileRequest) returns (GetUserProfileResponse);
-  rpc UpdateUserProfile (UpdateUserProfileRequest) returns (UpdateUserProfileResponse);
+  rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse);
+  rpc AuthenticateUser(AuthenticateUserRequest) returns (AuthenticateUserResponse);
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+  rpc UpdateUserProfile(UpdateUserProfileRequest) returns (UpdateUserProfileResponse);
 }
 
 message User {

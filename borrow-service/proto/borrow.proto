@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package borrow;
 
-option go_package = "./borrow-service/proto";
+option go_package = "./proto";
 
 service BorrowService {
   rpc BorrowBook (BorrowBookRequest) returns (BorrowBookResponse);

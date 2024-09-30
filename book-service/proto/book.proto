@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package book;
 
-option go_package = "./book-service/proto";
+option go_package = "./proto";
 
 service BookService {
   rpc ListBooks (ListBooksRequest) returns (ListBooksResponse);
