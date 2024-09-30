@@ -223,3 +223,67 @@ func deleteBook(ctx context.Context, bookID string) error {
 	_, err = client.DeleteBook(ctx, req)
 	return err
 }
+
+// @Summary Search books
+// @Description Search books by title, author, or category
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param title query string false "Book title"
+// @Param author query string false "Book author"
+// @Param category query string false "Book category"
+// @Success 200 {array} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /books/search [get]
+func HandleSearchBooks(c *gin.Context) {
+	token := c.Request.Header.Get("Authorization")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
+		return
+	}
+
+	token = strings.TrimPrefix(token, "Bearer ")
+
+	_, _, err := AuthenticateUser(c.Request.Context(), token)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	title := c.Query("title")
+	author := c.Query("author")
+	category := c.Query("category")
+
+	books, err := searchBooks(c.Request.Context(), title, author, category)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search books"})
+		return
+	}
+
+	c.JSON(http.StatusOK, books)
+}
+
+func searchBooks(ctx context.Context, title, author, category string) ([]*bookpb.Book, error) {
+	conn, err := grpc.NewClient("book-service:50051", grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := bookpb.NewBookServiceClient(conn)
+
+	req := &bookpb.SearchBooksRequest{
+		Title:    title,
+		Author:   author,
+		Category: category,
+	}
+
+	res, err := client.SearchBooks(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Books, nil
+}

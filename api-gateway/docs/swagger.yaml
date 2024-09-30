@@ -184,6 +184,47 @@ paths:
       summary: Return a book
       tags:
       - borrow
+  /books/search:
+    get:
+      consumes:
+      - application/json
+      description: Search books by title, author, or category
+      parameters:
+      - description: Book title
+        in: query
+        name: title
+        type: string
+      - description: Book author
+        in: query
+        name: author
+        type: string
+      - description: Book category
+        in: query
+        name: category
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search books
+      tags:
+      - books
   /users/login:
     post:
       consumes:
@@ -214,6 +255,96 @@ paths:
             additionalProperties: true
             type: object
       summary: Login user
+      tags:
+      - users
+  /users/profile:
+    post:
+      consumes:
+      - application/json
+      description: Retrieves the profile information for the authenticated user
+      parameters:
+      - description: User email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Email cannot be empty
+          schema:
+            type: string
+        "401":
+          description: Invalid or missing token
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get a user's profile
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update profile information for the authenticated user
+      parameters:
+      - description: New name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: New email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Email, name, or email cannot be empty
+          schema:
+            type: string
+        "401":
+          description: Invalid or missing token
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update a user's profile
       tags:
       - users
   /users/register:

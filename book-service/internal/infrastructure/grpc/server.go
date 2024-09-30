@@ -162,6 +162,18 @@ func (s *BookGRPCServer) DeleteBook(ctx context.Context, req *pb.DeleteBookReque
 	}, nil
 }
 
+// SearchBooks
+// @Summary Search books by title, author, or category
+// @Description Searches for books in the library by title, author, or category
+// @Tags books
+// @Accept  json
+// @Produce  json
+// @Param title query string false "Book title"
+// @Param author query string false "Book author"
+// @Param category query string false "Book category"
+// @Success 200 {object} map[string]interface{} "List of books that match the search criteria"
+// @Failure 500 {string} string "Internal server error"
+// @Router /books/search [get]
 func (s *BookGRPCServer) SearchBooks(ctx context.Context, req *pb.SearchBooksRequest) (*pb.SearchBooksResponse, error) {
 	books, err := s.service.SearchBooks(ctx, req.Title, req.Author, req.Category)
 	if err != nil {
@@ -182,6 +194,18 @@ func (s *BookGRPCServer) SearchBooks(ctx context.Context, req *pb.SearchBooksReq
 	return &response, nil
 }
 
+// CheckAvailability
+// @Summary Check the availability status of a book
+// @Description Checks whether a specific book is available, borrowed, or reserved
+// @Tags books
+// @Accept  json
+// @Produce  json
+// @Param book_id path string true "Book ID"
+// @Success 200 {object} map[string]interface{} "Book availability status"
+// @Failure 400 {string} string "Book ID cannot be empty"
+// @Failure 404 {string} string "Book not found"
+// @Failure 500 {string} string "Internal server error"
+// @Router /books/{book_id}/availability [get]
 func (s *BookGRPCServer) CheckAvailability(ctx context.Context, req *pb.CheckAvailabilityRequest) (*pb.CheckAvailabilityResponse, error) {
 	status, err := s.service.CheckAvailability(ctx, req.BookId)
 	if err != nil {
@@ -191,6 +215,19 @@ func (s *BookGRPCServer) CheckAvailability(ctx context.Context, req *pb.CheckAva
 	return &pb.CheckAvailabilityResponse{Status: status}, nil
 }
 
+// UpdateBookStatus
+// @Summary Update the status of a book
+// @Description Updates the status of a book to available, borrowed, or reserved
+// @Tags books
+// @Accept  json
+// @Produce  json
+// @Param book_id path string true "Book ID"
+// @Param status body string true "New status of the book"
+// @Success 200 {object} map[string]interface{} "Book status updated successfully"
+// @Failure 400 {string} string "Book ID or status cannot be empty"
+// @Failure 404 {string} string "Book not found"
+// @Failure 500 {string} string "Internal server error"
+// @Router /books/{book_id}/status [put]
 func (s *BookGRPCServer) UpdateBookStatus(ctx context.Context, req *pb.UpdateBookStatusRequest) (*pb.UpdateBookStatusResponse, error) {
 	err := s.service.UpdateBookStatus(ctx, req.BookId, req.Status)
 	if err != nil {

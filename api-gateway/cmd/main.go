@@ -43,6 +43,8 @@ func main() {
 
 			books.POST("/borrow", handler.HandleBorrowBook)
 			books.POST("/return", handler.HandleReturnBook)
+
+			books.GET("/search", handler.HandleSearchBooks)
 		}
 
 		users := v1.Group("/users")

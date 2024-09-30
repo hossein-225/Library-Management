@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"strconv"
 
 	"github.com/hossein-225/Library-Management/book-service/internal/domain"
 	pb "github.com/hossein-225/Library-Management/book-service/proto"
@@ -56,17 +57,21 @@ func (r *PostgresBookRepository) DeleteBook(ctx context.Context, id string) erro
 func (r *PostgresBookRepository) SearchBooks(ctx context.Context, title, author, category string) ([]*domain.Book, error) {
 	query := "SELECT id, title, author, category, status FROM books WHERE 1=1"
 	params := []interface{}{}
+	j := 1
 
 	if title != "" {
-		query += " AND title ILIKE $1"
+		query += " AND title ILIKE $" + strconv.Itoa(j)
+		j++
 		params = append(params, "%"+title+"%")
 	}
 	if author != "" {
-		query += " AND author ILIKE $2"
+		query += " AND author ILIKE $" + strconv.Itoa(j)
+		j++
 		params = append(params, "%"+author+"%")
 	}
 	if category != "" {
-		query += " AND category ILIKE $3"
+		query += " AND category ILIKE $" + strconv.Itoa(j)
+		j++
 		params = append(params, "%"+category+"%")
 	}
 
